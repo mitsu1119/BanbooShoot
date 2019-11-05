@@ -10,5 +10,5 @@ Point::Point(double x, double y): x(x), y(y) {
 // ----------------------------------------------------- Image class ------------------------------------------------------
 Image::Image(const char *path) {
 	this->handle = LoadGraph(path);
-	GetGraphSize(handle, &sizeX, &sizeY);
+	GetGraphSize(this->handle, &this->sizeX, &this->sizeY);
 }

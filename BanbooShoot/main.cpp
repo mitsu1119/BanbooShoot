@@ -1,4 +1,6 @@
 #include "DxLib.h"
+#include "Game.h"
+#include "Util.h"
 #include "Character.h"
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) {
@@ -8,13 +10,12 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	Image image("dat\\image\\player\\Shirokami.png");
 	Character chara(&image);
 
+	Play game(&chara);
+
 	SetDrawScreen(DX_SCREEN_BACK);
 	while(ProcessMessage() == 0) {
-		ClearDrawScreen();
-
-		chara.draw();
-
-		ScreenFlip();
+		game.update();
+		game.draw();
 	}
 
 	DxLib_End();
