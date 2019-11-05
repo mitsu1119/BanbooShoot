@@ -7,38 +7,49 @@ class Scene {
 protected:
 	int counter;
 
+	Direction keyDirection;
+
+	void checkKey();
+	virtual void keyProcessing() = 0;
+
 public:
-	Scene(): counter(0) {}
+	Scene(): counter(0), keyDirection(CENTER) {}
 
 	virtual int update() = 0;
-	virtual void draw() = 0;
+	virtual void draw() const = 0;
 };
 
 // Play class. Actual game disp.
 class Play: public Scene {
 private:
-	Character *player;
+	// Player datas.
+	Player *player;
+
+	// System datas.
+	void keyProcessing();
+	ScreenRect screen;
 
 public:
-	Play(Character *player);
+	Play(Player *player, ScreenRect screen);
 
-	virtual int update();
-	virtual void draw();
+	int update();
+	void draw() const;
 };
 
 // Scene manager.
 class Game {
 private:
 	// Player datas.
-	Character *player;
+	Player *player;
 
 	// System datas.
 	Scene *nowScene;
+	ScreenRect playScreen;
 
 public:
-	Game();
+	Game(ScreenRect playScreen);
 	~Game();
 
 	void update();
-	void draw();
+	void draw() const;
 };
