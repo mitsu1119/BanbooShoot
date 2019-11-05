@@ -14,6 +14,7 @@ public:
 	virtual void draw() = 0;
 };
 
+// Play class. Actual game disp.
 class Play: public Scene {
 private:
 	Character *player;
@@ -25,3 +26,19 @@ public:
 	virtual void draw();
 };
 
+// Scene manager.
+class Game {
+private:
+	// Player datas.
+	Character *player;
+
+	// System datas.
+	Scene *nowScene;
+
+public:
+	Game();
+	~Game();
+
+	void update();
+	void draw();
+};

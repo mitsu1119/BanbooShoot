@@ -8,7 +8,8 @@ protected:
 	Point *point;				/* central coordinate */
 
 public:
-	Character(const Image *img);		/* generate from image */
+	Character(const Image *img);			/* generate from image */
+	Character(const char *imgpath);		/* generate from image file path */
 	~Character();
 
 	const Point *getPoint() const;
