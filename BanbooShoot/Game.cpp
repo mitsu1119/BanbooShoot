@@ -55,7 +55,7 @@ void Play::draw() const {
 
 // ----------------------------------------------------- Game class -------------------------------------------------------
 Game::Game(ScreenRect playScreen): playScreen(playScreen) {
-	this->player = new Player("dat\\image\\player\\Shirokami.png");
+	loadPlayers();
 
 	// The first cene type is play
 	this->nowScene = new Play(this->player, playScreen);
@@ -64,6 +64,53 @@ Game::Game(ScreenRect playScreen): playScreen(playScreen) {
 Game::~Game() {
 	delete this->player;
 	delete this->nowScene;
+}
+
+bool Game::loadPlayers() {
+	MSXML2::IXMLDOMDocument2Ptr pDocument;
+	HRESULT hr = pDocument.CreateInstance(__uuidof(MSXML2::DOMDocument60), NULL, CLSCTX_INPROC_SERVER);
+	if(FAILED(hr)) return false;
+
+	pDocument->async = VARIANT_FALSE;
+	pDocument->validateOnParse = VARIANT_FALSE;
+	pDocument->resolveExternals = VARIANT_FALSE;
+	pDocument->preserveWhiteSpace = VARIANT_FALSE;
+
+	if(pDocument->load("dat\\database\\player.xml") == VARIANT_TRUE) {
+		// Search root tag.
+		MSXML2::IXMLDOMNodeListPtr pList = pDocument->selectNodes("player");
+		MSXML2::IXMLDOMElementPtr pRoot;
+		if(pList->length > 0) pRoot = pList->item[0];
+		else return false;
+			
+		// Load playerimage.
+		_variant_t v;
+		std::string name, path;
+		pList = pRoot->selectNodes("//playerimage");
+		MSXML2::IXMLDOMElementPtr pPlayerImage;
+		for(int i = 0; i < pList->length; i++) {
+			pPlayerImage = pList->item[i];
+			v = pPlayerImage->getAttribute("name");
+			name = _com_util::ConvertBSTRToString(v.bstrVal);
+			v = pPlayerImage->getAttribute("path");
+			path = _com_util::ConvertBSTRToString(v.bstrVal);
+			this->playerImages[name] = new Image(path.c_str());
+		}
+
+		// Load playerdefine.
+		pList = pRoot->selectNodes("//playerdefine");
+		MSXML2::IXMLDOMElementPtr pPlayerDefine;
+		double speed;
+		for(int i = 0; i < pList->length; i++) {
+			pPlayerDefine = pList->item[i];
+			v = pPlayerDefine->getAttribute("name");
+			name = _com_util::ConvertBSTRToString(v.bstrVal);
+			v = pPlayerDefine->getAttribute("speed");
+			speed = _wtof(v.bstrVal);
+			this->player = new Player(this->playerImages[name], speed);
+		}			
+	}
+	return true;
 }
 
 void Game::update() {

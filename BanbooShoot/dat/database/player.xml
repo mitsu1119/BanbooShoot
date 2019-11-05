@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<player>
+	<!-- プレイヤー画像の定義 -->
+	<playerimage name="Shirokami_chann" path="dat\\image\\player\\Shirokami.png"/>
+		
+	<!-- プレイヤーの定義 -->
+	<playerdefine name="Shirokami_chann" speed="5"/>
+</player>

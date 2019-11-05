@@ -1,4 +1,8 @@
 #pragma once
+#include <unordered_map>
+#include <string>
+#include <windows.h>
+#import <msxml6.dll>
 #include "Util.h"
 #include "Character.h"
 
@@ -43,8 +47,14 @@ private:
 	Player *player;
 
 	// System datas.
-	Scene *nowScene;
 	ScreenRect playScreen;
+	Scene *nowScene;
+
+	// Image database.
+	std::unordered_map<std::string, const Image *> playerImages;
+
+	// Loading function.
+	bool loadPlayers();
 
 public:
 	Game(ScreenRect playScreen);
