@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <player>
 	<!-- プレイヤー画像の定義 -->
-	<playerimage name="Shirokami_chann" path="dat\\image\\player\\Shirokami.png" animinterval="5">
-		<animation sx="0" sy="0" width="50" height="10"/>
-		<animation sx="0" sy="10" width="50" height="10"/>
-		<animation sx="0" sy="20" width="50" height="10"/>
-		<animation sx="0" sy="30" width="50" height="10"/>
-		<animation sx="0" sy="40" width="50" height="10"/>
-		<animation sx="0" sy="50" width="50" height="10"/>
+	<playerimage name="Shirokami_chann" path="dat\\image\\player\\Shirokami.png" animinterval="8">
+		<animation sx="0" sy="0" width="50" height="60"/>
+		<animation sx="50" sy="0" width="50" height="60"/>
+		<animation sx="100" sy="0" width="50" height="60"/>
+		<animation sx="150" sy="0" width="50" height="60"/>
+		<animation sx="0" sy="60" width="50" height="60"/>
+		<animation sx="50" sy="60" width="50" height="60"/>
+		<animation sx="100" sy="60" width="50" height="60"/>
+		<animation sx="150" sy="60" width="50" height="60"/>
+		<animation sx="0" sy="120" width="50" height="60"/>
+		<animation sx="50" sy="120" width="50" height="60"/>
+		<animation sx="100" sy="120" width="50" height="60"/>
+		<animation sx="150" sy="120" width="50" height="60"/>
 	</playerimage>
 		
 	<!-- プレイヤーの定義 -->
