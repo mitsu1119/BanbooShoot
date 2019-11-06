@@ -7,7 +7,6 @@
 class Character {
 protected:
 	const Animation *anim;
-	bool imgFreeFlag;		/* If @img was allcated in the constructor, @img must freed in the destructor */
 
 	Point *point;				/* central coordinate */
 
@@ -15,7 +14,8 @@ protected:
 	double speed;
 
 public:
-	Character(const Image *img, double speed);			/* generate from image handle */
+	Character(const Image *img, double speed);																/* generate from image handle */
+	Character(std::vector<const Image *> &anim, size_t animInterval, double speed);	/* generate from animation parts */
 	~Character();
 
 	const Point *getPoint() const;
@@ -31,7 +31,8 @@ inline const Image *Character::getImage() const { return this->anim->getImage();
 // Player class.
 class Player: public Character {
 public:
-	Player(const Image *img, double speed);			/* generate from image handle */
+	Player(const Image *img, double speed);																/* generate from image handle */
+	Player(std::vector<const Image *> &anim, size_t animInterval, double speed);	/* generate from animation parts */
 
 	void move(Direction dir);
 };

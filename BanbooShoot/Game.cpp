@@ -65,6 +65,10 @@ Game::Game(ScreenRect playScreen): playScreen(playScreen) {
 Game::~Game() {
 	delete this->player;
 	delete this->nowScene;
+	for(auto &myPair: this->playerImages) {
+		for(auto &image: myPair.second)
+			delete image;
+	}
 }
 
 bool Game::loadPlayers() {
@@ -95,7 +99,7 @@ bool Game::loadPlayers() {
 			name = _com_util::ConvertBSTRToString(v.bstrVal);
 			v = pPlayerImage->getAttribute("path");
 			path = _com_util::ConvertBSTRToString(v.bstrVal);
-			this->playerImages[name] = new Image(path.c_str());
+			this->playerImages[name].emplace_back(new Image(path.c_str()));
 		}
 
 		// Load playerdefine.
@@ -108,7 +112,7 @@ bool Game::loadPlayers() {
 			name = _com_util::ConvertBSTRToString(v.bstrVal);
 			v = pPlayerDefine->getAttribute("speed");
 			speed = _wtof(v.bstrVal);
-			this->player = new Player(this->playerImages[name], speed);
+			this->player = new Player(this->playerImages[name], 3, speed);
 		}			
 	}
 	return true;

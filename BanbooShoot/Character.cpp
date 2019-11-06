@@ -6,6 +6,11 @@ Character::Character(const Image *img, double speed): speed(speed) {
 	this->anim = new Animation(img);
 }
 
+Character::Character(std::vector<const Image *> &anim, size_t animInterval, double speed): speed(speed) {
+	this->point = new Point(0, 0);
+	this->anim = new Animation(anim, animInterval);
+}
+
 Character::~Character() {
 	delete this->point;
 	delete this->anim;
@@ -22,6 +27,9 @@ void Character::draw() const {
 
 // ----------------------------------------------------- Player class -----------------------------------------------------
 Player::Player(const Image *img, double speed): Character(img, speed) {
+}
+
+Player::Player(std::vector<const Image *> &anim, size_t animInterval, double speed): Character(anim, animInterval, speed) {
 }
 
 void Player::move(Direction dir) {

@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include <string>
+#include <vector>
 #include <windows.h>
 #import <msxml6.dll>
 #include "Util.h"
@@ -56,7 +57,7 @@ private:
 	Scene *nowScene;
 
 	// Image database.
-	std::unordered_map<std::string, const Image *> playerImages;
+	std::unordered_map<std::string, std::vector<const Image *>> playerImages;
 
 	// Loading function.
 	bool loadPlayers();
