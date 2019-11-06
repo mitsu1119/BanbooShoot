@@ -66,3 +66,35 @@ public:
 inline int Image::getSizeX() const { return this->sizeX; }
 inline int Image::getSizeY() const { return this->sizeY; }
 inline int Image::getHandle() const { return this->handle; }
+
+// Animation class
+class Animation {
+private:
+	bool animationFlag;
+	size_t counter, interval, number, index;
+	std::vector<const Image *> images;
+
+public:
+	Animation(std::vector<const Image *> &images, int interval): images(images), counter(0), interval(interval), number(images.size()), index(0), animationFlag(true) {
+	}
+	Animation(const Image *image): images({image}), counter(0), interval(1), number(1), index(0), animationFlag(false) {
+	}
+
+	void update();
+	int getSizeX() const;
+	int getSizeY() const;
+	int getHandle() const;
+	const Image *getImage() const;
+};
+inline void Animation::update() {
+	if(!animationFlag) return;
+	this->counter = (this->counter + 1) % (this->interval * this->number);
+	this->index = this->counter / this->interval;
+}
+inline int Animation::getSizeX() const { return this->images[this->index]->getSizeX(); }
+inline int Animation::getSizeY() const { return this->images[this->index]->getSizeY(); }
+inline int Animation::getHandle() const { return this->images[this->index]->getHandle(); }
+inline const Image *Animation::getImage() const { return this->images[this->index]; }
+
+
+

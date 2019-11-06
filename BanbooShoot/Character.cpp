@@ -1,18 +1,14 @@
 #include "Character.h"
 
 // ----------------------------------------------------- Character class --------------------------------------------------
-Character::Character(const Image *img, double speed): img(img), speed(speed), imgFreeFlag(false) {
+Character::Character(const Image *img, double speed): speed(speed) {
 	this->point = new Point(0, 0);
-}
-
-Character::Character(const char *imgpath, double speed): speed(speed), imgFreeFlag(true) {
-	this->img = new Image(imgpath);
-	this->point = new Point(0, 0);
+	this->anim = new Animation(img);
 }
 
 Character::~Character() {
 	delete this->point;
-	if(imgFreeFlag) delete this->img;
+	delete this->anim;
 }
 
 void Character::setCoord(double x, double y) {
@@ -21,14 +17,11 @@ void Character::setCoord(double x, double y) {
 }
 
 void Character::draw() const {
-	DrawRotaGraph((int)this->point->getX(), (int)this->point->getY(), 1.0, 0.0, this->img->getHandle(), true);
+	DrawRotaGraph((int)this->point->getX(), (int)this->point->getY(), 1.0, 0.0, this->anim->getHandle(), true);
 }
 
 // ----------------------------------------------------- Player class -----------------------------------------------------
 Player::Player(const Image *img, double speed): Character(img, speed) {
-}
-
-Player::Player(const char *imgpath, double speed): Character(imgpath, speed) {
 }
 
 void Player::move(Direction dir) {

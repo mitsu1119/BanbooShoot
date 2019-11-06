@@ -58,6 +58,7 @@ Game::Game(ScreenRect playScreen): playScreen(playScreen) {
 	loadPlayers();
 
 	// The first cene type is play
+	this->nowSceneType = SCENE_GAME_1;
 	this->nowScene = new Play(this->player, playScreen);
 }
 

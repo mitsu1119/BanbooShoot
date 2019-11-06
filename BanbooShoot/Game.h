@@ -43,11 +43,16 @@ public:
 // Scene manager.
 class Game {
 private:
+	enum SceneType {
+		SCENE_GAME_1
+	};
+
 	// Player datas.
 	Player *player;
 
 	// System datas.
 	ScreenRect playScreen;
+	SceneType nowSceneType;
 	Scene *nowScene;
 
 	// Image database.
