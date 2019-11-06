@@ -19,3 +19,10 @@ Image::Image(const char *path) {
 	this->handle = LoadGraph(path);
 	GetGraphSize(this->handle, &this->sizeX, &this->sizeY);
 }
+
+Image::Image(const char *path, int srcX, int srcY, int width, int height) {
+	int bufHandle = LoadGraph(path);
+	this->handle = DerivationGraph(srcX, srcY, width, height, bufHandle);
+	this->sizeX = width;
+	this->sizeY = height;
+}

@@ -6,7 +6,7 @@
 // Base class.
 class Character {
 protected:
-	const Animation *anim;
+	Animation *anim;
 
 	Point *point;				/* central coordinate */
 
@@ -23,6 +23,7 @@ public:
 
 	const Image *getImage() const;
 
+	virtual void update();
 	void draw() const;
 };
 inline const Point *Character::getPoint() const { return this->point; }

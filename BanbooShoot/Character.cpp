@@ -21,6 +21,10 @@ void Character::setCoord(double x, double y) {
 	this->point->setY(y);
 }
 
+void Character::update() {
+	this->anim->update();
+}
+
 void Character::draw() const {
 	DrawRotaGraph((int)this->point->getX(), (int)this->point->getY(), 1.0, 0.0, this->anim->getHandle(), true);
 }

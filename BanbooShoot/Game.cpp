@@ -28,6 +28,7 @@ int Play::update() {
 	this->counter++;
 	checkKey();
 	keyProcessing();
+	this->player->update();
 	return 0;
 }
 
@@ -92,14 +93,36 @@ bool Game::loadPlayers() {
 		_variant_t v;
 		std::string name, path;
 		pList = pRoot->selectNodes("//playerimage");
-		MSXML2::IXMLDOMElementPtr pPlayerImage;
+		MSXML2::IXMLDOMElementPtr pPlayerImage, pAnimation;
+		MSXML2::IXMLDOMNodeListPtr pAnimations;
+		int sx, sy, width, height;
+		std::unordered_map<std::string, int> playerImagesInterval;
 		for(int i = 0; i < pList->length; i++) {
 			pPlayerImage = pList->item[i];
 			v = pPlayerImage->getAttribute("name");
 			name = _com_util::ConvertBSTRToString(v.bstrVal);
 			v = pPlayerImage->getAttribute("path");
 			path = _com_util::ConvertBSTRToString(v.bstrVal);
-			this->playerImages[name].emplace_back(new Image(path.c_str()));
+			v = pPlayerImage->getAttribute("animinterval");
+			if(v.vt != VT_NULL) playerImagesInterval[name] = _wtoi(v.bstrVal);
+			else playerImagesInterval[name] = 100;
+			pAnimations = pPlayerImage->selectNodes("animation");
+			if(pAnimations->length != 0) {
+				for(int j = 0; j < pAnimations->length; j++) {
+					pAnimation = pAnimations->item[j];
+					v = pAnimation->getAttribute("sx");
+					sx = _wtoi(v.bstrVal);
+					v = pAnimation->getAttribute("sy");
+					sy = _wtoi(v.bstrVal);
+					v = pAnimation->getAttribute("width");
+					width = _wtoi(v.bstrVal);
+					v = pAnimation->getAttribute("height");
+					height = _wtoi(v.bstrVal);
+					this->playerImages[name].emplace_back(new Image(path.c_str(), sx, sy, width, height));
+				}
+			} else {
+				this->playerImages[name].emplace_back(new Image(path.c_str()));
+			}
 		}
 
 		// Load playerdefine.
@@ -112,7 +135,7 @@ bool Game::loadPlayers() {
 			name = _com_util::ConvertBSTRToString(v.bstrVal);
 			v = pPlayerDefine->getAttribute("speed");
 			speed = _wtof(v.bstrVal);
-			this->player = new Player(this->playerImages[name], 3, speed);
+			this->player = new Player(this->playerImages[name], playerImagesInterval[name], speed);
 		}			
 	}
 	return true;

@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <player>
 	<!-- プレイヤー画像の定義 -->
-	<playerimage name="Shirokami_chann" path="dat\\image\\player\\Shirokami.png"/>
+	<playerimage name="Shirokami_chann" path="dat\\image\\player\\Shirokami.png" animinterval="5">
+		<animation sx="0" sy="0" width="50" height="10"/>
+		<animation sx="0" sy="10" width="50" height="10"/>
+		<animation sx="0" sy="20" width="50" height="10"/>
+		<animation sx="0" sy="30" width="50" height="10"/>
+		<animation sx="0" sy="40" width="50" height="10"/>
+		<animation sx="0" sy="50" width="50" height="10"/>
+	</playerimage>
 		
 	<!-- プレイヤーの定義 -->
-	<playerdefine name="Shirokami_chann" speed="5"/>
+	<playerdefine name="Shirokami_chann" speed="5" />
 </player>

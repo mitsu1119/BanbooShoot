@@ -58,6 +58,7 @@ private:
 
 public:
 	Image(const char *path);
+	Image(const char *path, int srcX, int srcY, int width, int height);
 
 	int getSizeX() const;
 	int getSizeY() const;
