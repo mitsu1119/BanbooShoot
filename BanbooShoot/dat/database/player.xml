@@ -2,20 +2,23 @@
 <player>
 	<!-- プレイヤー画像の定義 -->
 	<playerimage name="Shirokami_chann" path="dat\\image\\player\\Shirokami.png" animinterval="8">
-		<animation sx="0" sy="0" width="50" height="60"/>
-		<animation sx="50" sy="0" width="50" height="60"/>
-		<animation sx="100" sy="0" width="50" height="60"/>
-		<animation sx="150" sy="0" width="50" height="60"/>
-		<animation sx="0" sy="60" width="50" height="60"/>
-		<animation sx="50" sy="60" width="50" height="60"/>
-		<animation sx="100" sy="60" width="50" height="60"/>
-		<animation sx="150" sy="60" width="50" height="60"/>
-		<animation sx="0" sy="120" width="50" height="60"/>
-		<animation sx="50" sy="120" width="50" height="60"/>
-		<animation sx="100" sy="120" width="50" height="60"/>
-		<animation sx="150" sy="120" width="50" height="60"/>
+		<animation sx="0" sy="0" width="50" height="60" />
+		<animation sx="50" sy="0" width="50" height="60" />
+		<animation sx="100" sy="0" width="50" height="60" />
+		<animation sx="150" sy="0" width="50" height="60" />
+		<animation sx="0" sy="60" width="50" height="60" />
+		<animation sx="50" sy="60" width="50" height="60" />
+		<animation sx="100" sy="60" width="50" height="60" />
+		<animation sx="150" sy="60" width="50" height="60" />
+		<animation sx="0" sy="120" width="50" height="60" />
+		<animation sx="50" sy="120" width="50" height="60" />
+		<animation sx="100" sy="120" width="50" height="60" />
+		<animation sx="150" sy="120" width="50" height="60" />
 	</playerimage>
+	
+	<playerimage name="Shirokami_chann_left" path="dat\\image\\player\\ShirokamiLeft.png" />
+	<playerimage name="Shirokami_chann_right" path="dat\\image\\player\\ShirokamiRight.png" />
 		
 	<!-- プレイヤーの定義 -->
-	<playerdefine name="Shirokami_chann" speed="5" />
+	<playerdefine name="Shirokami_chann" leftname="Shirokami_chann_left" rightname="Shirokami_chann_right" speed="5" />
 </player>

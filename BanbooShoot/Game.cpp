@@ -128,6 +128,7 @@ bool Game::loadPlayers() {
 		// Load playerdefine.
 		pList = pRoot->selectNodes("//playerdefine");
 		MSXML2::IXMLDOMElementPtr pPlayerDefine;
+		std::string leftName, rightName;
 		double speed;
 		for(int i = 0; i < pList->length; i++) {
 			pPlayerDefine = pList->item[i];
@@ -135,8 +136,14 @@ bool Game::loadPlayers() {
 			name = _com_util::ConvertBSTRToString(v.bstrVal);
 			v = pPlayerDefine->getAttribute("speed");
 			speed = _wtof(v.bstrVal);
-			this->player = new Player(this->playerImages[name], playerImagesInterval[name], speed);
-		}			
+			v = pPlayerDefine->getAttribute("leftname");
+			if(v.vt != VT_NULL) leftName = _com_util::ConvertBSTRToString(v.bstrVal);
+			else leftName = name;
+			v = pPlayerDefine->getAttribute("rightname");
+			if(v.vt != VT_NULL) rightName = _com_util::ConvertBSTRToString(v.bstrVal);
+			else rightName = name;
+			this->player = new Player(this->playerImages[name], this->playerImages[leftName], this->playerImages[rightName], playerImagesInterval[name], speed);
+		}
 	}
 	return true;
 }

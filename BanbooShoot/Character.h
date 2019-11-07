@@ -24,16 +24,22 @@ public:
 	const Image *getImage() const;
 
 	virtual void update();
-	void draw() const;
+	virtual void draw() const;
 };
 inline const Point *Character::getPoint() const { return this->point; }
 inline const Image *Character::getImage() const { return this->anim->getImage(); }
 
 // Player class.
 class Player: public Character {
+private:
+	Animation *leftAnim, *rightAnim;
+	Direction movingDir;
+
 public:
 	Player(const Image *img, double speed);																/* generate from image handle */
-	Player(std::vector<const Image *> &anim, size_t animInterval, double speed);	/* generate from animation parts */
+	Player(std::vector<const Image *> &anim, std::vector<const Image *> &leftAnimation, std::vector<const Image *> &rightAnimation, size_t animInterval, double speed);	/* generate from animation parts */
+	~Player();
 
 	void move(Direction dir);
+	void draw() const;
 };

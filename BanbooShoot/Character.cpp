@@ -30,14 +30,42 @@ void Character::draw() const {
 }
 
 // ----------------------------------------------------- Player class -----------------------------------------------------
-Player::Player(const Image *img, double speed): Character(img, speed) {
+Player::Player(const Image *img, double speed): Character(img, speed), movingDir(CENTER) {
+	this->leftAnim = new Animation(img);
+	this->rightAnim = new Animation(img);
 }
 
-Player::Player(std::vector<const Image *> &anim, size_t animInterval, double speed): Character(anim, animInterval, speed) {
+Player::Player(std::vector<const Image *> &anim, std::vector<const Image *> &leftAnimation, std::vector<const Image *> &rightAnimation, size_t animInterval, double speed): Character(anim, animInterval, speed), movingDir(CENTER) {
+	this->leftAnim = new Animation(leftAnimation, animInterval);
+	this->rightAnim = new Animation(rightAnimation, animInterval);
+}
+
+Player::~Player() {
+	delete this->leftAnim;
+	delete this->rightAnim;
 }
 
 void Player::move(Direction dir) {
+	this->movingDir = dir;
 	if(dir == CENTER) return;
+
 	this->point->moveX(speed * cos(dir *M_PI / 4));
 	this->point->moveY(-1 * speed * sin(dir * M_PI / 4));
+}
+
+void Player::draw() const {
+	switch(this->movingDir) {
+	case RUP:
+	case RIGHT:
+	case RDOWN:
+		DrawRotaGraph((int)this->point->getX(), (int)this->point->getY(), 1.0, 0.0, this->rightAnim->getHandle(), true);
+		break;
+	case LUP:
+	case LEFT:
+	case LDOWN:
+		DrawRotaGraph((int)this->point->getX(), (int)this->point->getY(), 1.0, 0.0, this->leftAnim->getHandle(), true);
+		break;
+	default:
+		DrawRotaGraph((int)this->point->getX(), (int)this->point->getY(), 1.0, 0.0, this->anim->getHandle(), true);
+	}
 }
