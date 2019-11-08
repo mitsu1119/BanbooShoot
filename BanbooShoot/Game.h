@@ -49,7 +49,7 @@ private:
 	};
 
 	// Player datas.
-	Player *player;
+	std::vector<Player *> player;
 
 	// System datas.
 	ScreenRect playScreen;

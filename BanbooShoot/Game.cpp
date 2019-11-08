@@ -60,11 +60,13 @@ Game::Game(ScreenRect playScreen): playScreen(playScreen) {
 
 	// The first cene type is play
 	this->nowSceneType = SCENE_GAME_1;
-	this->nowScene = new Play(this->player, playScreen);
+
+	// Use player 0. 
+	this->nowScene = new Play(this->player[0], playScreen);
 }
 
 Game::~Game() {
-	delete this->player;
+	for(auto &i: this->player) delete i;
 	delete this->nowScene;
 	for(auto &myPair: this->playerImages) {
 		for(auto &image: myPair.second)
@@ -142,7 +144,7 @@ bool Game::loadPlayers() {
 			v = pPlayerDefine->getAttribute("rightname");
 			if(v.vt != VT_NULL) rightName = _com_util::ConvertBSTRToString(v.bstrVal);
 			else rightName = name;
-			this->player = new Player(this->playerImages[name], this->playerImages[leftName], this->playerImages[rightName], playerImagesInterval[name], speed);
+			this->player.emplace_back(new Player(this->playerImages[name], this->playerImages[leftName], this->playerImages[rightName], playerImagesInterval[name], speed));
 		}
 	}
 	return true;
