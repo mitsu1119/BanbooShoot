@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<stage>
+	<!-- 敵画像の定義 -->
+	<enemyimage name="Sphere" path="dat\\image\\enemy\\Sphere.png" animinterval="4">
+		<animation sx="0" sy="0" width="46" height="46" />
+		<animation sx="46" sy="0" width="46" height="46" />
+		<animation sx="92" sy="0" width="46" height="46" />
+		<animation sx="138" sy="0" width="46" height="46" />
+		<animation sx="184" sy="0" width="46" height="46" />
+		<animation sx="230" sy="0" width="46" height="46" />
+		<animation sx="276" sy="0" width="46" height="46" />
+		<animation sx="322" sy="0" width="46" height="46" />
+		<animation sx="368" sy="0" width="46" height="46" />
+		<animation sx="414" sy="0" width="46" height="46" />
+		<animation sx="460" sy="0" width="46" height="46" />
+		<animation sx="506" sy="0" width="46" height="46" />
+		<animation sx="552" sy="0" width="46" height="46" />
+		<animation sx="598" sy="0" width="46" height="46" />
+		<animation sx="644" sy="0" width="46" height="46" />
+		<animation sx="690" sy="0" width="46" height="46" />
+	</enemyimage>
+</stage>

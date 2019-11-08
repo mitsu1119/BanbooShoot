@@ -43,5 +43,8 @@
     <Xml Include="dat\database\player.xml">
       <Filter>リソース ファイル</Filter>
     </Xml>
+    <Xml Include="dat\stage\stage1.xml">
+      <Filter>リソース ファイル</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

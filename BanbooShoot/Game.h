@@ -34,8 +34,16 @@ private:
 	void keyProcessing();
 	ScreenRect screen;
 
+	// Image database.
+	std::unordered_map<std::string, std::vector<const Image *>> enemyImages;
+	std::unordered_map<std::string, const Animation *> enemyAnimations;
+
+	// Loading function.
+	bool loadStage(std::string stagePath);
+
 public:
-	Play(Player *player, ScreenRect screen);
+	Play(std::string stagePath, Player *player, ScreenRect screen);
+	~Play();
 
 	int update();
 	void draw() const;

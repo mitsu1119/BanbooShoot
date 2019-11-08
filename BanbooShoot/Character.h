@@ -36,10 +36,19 @@ private:
 	Direction movingDir;
 
 public:
-	Player(const Image *img, double speed);																/* generate from image handle */
+	Player(const Image *img, double speed);																/* generate from a image handle */
 	Player(std::vector<const Image *> &anim, std::vector<const Image *> &leftAnimation, std::vector<const Image *> &rightAnimation, size_t animInterval, double speed);	/* generate from animation parts */
 	~Player();
 
 	void move(Direction dir);
 	void draw() const;
+};
+
+// Enemy class.
+class Enemy: public Character {
+private:
+
+public:
+	Enemy(const Image *img, double speed);															/* generate from a image handle */
+	Enemy(std::vector<const Image *> &anim, size_t animInterval, double speed);		/* generate from animation parts */
 };

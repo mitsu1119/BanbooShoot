@@ -69,3 +69,10 @@ void Player::draw() const {
 		DrawRotaGraph((int)this->point->getX(), (int)this->point->getY(), 1.0, 0.0, this->anim->getHandle(), true);
 	}
 }
+
+// ----------------------------------------------------- Enemy class ------------------------------------------------------
+Enemy::Enemy(const Image *img, double speed) : Character(img, speed) {
+}
+
+Enemy::Enemy(std::vector<const Image *> &anim, size_t animInterval, double speed): Character(anim, animInterval, speed) {
+}

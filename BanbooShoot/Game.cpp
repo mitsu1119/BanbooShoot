@@ -21,7 +21,76 @@ void Scene::checkKey() {
 }
 
 // ----------------------------------------------------- Play class -------------------------------------------------------
-Play::Play(Player *player, ScreenRect screen): Scene(), player(player), screen(screen) {
+Play::Play(std::string stagePath, Player *player, ScreenRect screen): Scene(), player(player), screen(screen) {
+	loadStage(stagePath);
+}
+
+Play::~Play() {
+	for(auto &myPair: this->enemyImages) {
+		for(auto &image: myPair.second)
+			delete image;
+	}
+	
+	for(auto &anim: this->enemyAnimations) {
+		delete anim.second;
+	}
+}
+
+bool Play::loadStage(std::string stagePath) {
+	MSXML2::IXMLDOMDocument2Ptr pDocument;
+	HRESULT hr = pDocument.CreateInstance(__uuidof(MSXML2::DOMDocument60), NULL, CLSCTX_INPROC_SERVER);
+	if(FAILED(hr)) return false;
+
+	pDocument->async = VARIANT_FALSE;
+	pDocument->validateOnParse = VARIANT_FALSE;
+	pDocument->resolveExternals = VARIANT_FALSE;
+	pDocument->preserveWhiteSpace = VARIANT_FALSE;
+
+	if(pDocument->load(stagePath.c_str()) == VARIANT_TRUE) {
+		// Search root tag.
+		MSXML2::IXMLDOMNodeListPtr pList = pDocument->selectNodes("stage");
+		MSXML2::IXMLDOMElementPtr pRoot;
+		if(pList->length > 0) pRoot = pList->item[0];
+		else return false;
+
+		// Load playerimage.
+		_variant_t v;
+		std::string name, path;
+		pList = pRoot->selectNodes("enemyimage");
+		MSXML2::IXMLDOMElementPtr pEnemyImage, pAnimation;
+		MSXML2::IXMLDOMNodeListPtr pAnimations;
+		int sx, sy, width, height;
+		int enemyImageInterval;
+		for(int i = 0; i < pList->length; i++) {
+			pEnemyImage = pList->item[i];
+			v = pEnemyImage->getAttribute("name");
+			name = _com_util::ConvertBSTRToString(v.bstrVal);
+			v = pEnemyImage->getAttribute("path");
+			path = _com_util::ConvertBSTRToString(v.bstrVal);
+			v = pEnemyImage->getAttribute("animinterval");
+			if(v.vt != VT_NULL) enemyImageInterval = _wtoi(v.bstrVal);
+			else enemyImageInterval = 100;
+			pAnimations = pEnemyImage->selectNodes("animation");
+			if(pAnimations->length != 0) {
+				for(int j = 0; j < pAnimations->length; j++) {
+					pAnimation = pAnimations->item[j];
+					v = pAnimation->getAttribute("sx");
+					sx = _wtoi(v.bstrVal);
+					v = pAnimation->getAttribute("sy");
+					sy = _wtoi(v.bstrVal);
+					v = pAnimation->getAttribute("width");
+					width = _wtoi(v.bstrVal);
+					v = pAnimation->getAttribute("height");
+					height = _wtoi(v.bstrVal);
+					this->enemyImages[name].emplace_back(new Image(path.c_str(), sx, sy, width, height));
+				}
+			} else {
+				this->enemyImages[name].emplace_back(new Image(path.c_str()));
+			}
+			this->enemyAnimations[name] = new Animation(this->enemyImages[name], enemyImageInterval);
+		}
+	}
+	return true;
 }
 
 int Play::update() {
@@ -62,7 +131,7 @@ Game::Game(ScreenRect playScreen): playScreen(playScreen) {
 	this->nowSceneType = SCENE_GAME_1;
 
 	// Use player 0. 
-	this->nowScene = new Play(this->player[0], playScreen);
+	this->nowScene = new Play("dat\\stage\\stage1.csv", this->player[0], playScreen);
 }
 
 Game::~Game() {
