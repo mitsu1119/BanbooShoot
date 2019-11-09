@@ -19,4 +19,7 @@
 		<animation sx="644" sy="0" width="46" height="46" />
 		<animation sx="690" sy="0" width="46" height="46" />
 	</enemyimage>
+	
+	<!-- 敵の出現パターン -->
+	<enemy name="Sphere" speed="4" />
 </stage>

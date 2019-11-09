@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <string>
 #include <vector>
+#include <tuple>
 #include <windows.h>
 #import <msxml6.dll>
 #include "Util.h"
@@ -25,18 +26,26 @@ public:
 };
 
 // Play class. Actual game disp.
+constexpr size_t MAX_ENEMY_NUM = 10;
 class Play: public Scene {
 private:
 	// Player datas.
 	Player *player;
 
+	// Enemy datas.
+	enum PoolTuple {
+		POOL_FLAG, POOL_BODY
+	};
+	std::vector<std::tuple<bool, Enemy *>> enemyPool;
+
 	// System datas.
 	void keyProcessing();
 	ScreenRect screen;
+	void enemyProcessing();
 
 	// Image database.
 	std::unordered_map<std::string, std::vector<const Image *>> enemyImages;
-	std::unordered_map<std::string, const Animation *> enemyAnimations;
+	std::unordered_map<std::string, Animation *> enemyAnimations;
 
 	// Loading function.
 	bool loadStage(std::string stagePath);

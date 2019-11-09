@@ -86,6 +86,8 @@ public:
 	int getSizeY() const;
 	int getHandle() const;
 	const Image *getImage() const;
+	size_t getInterval() const;
+	std::vector<const Image *> *getParts();
 };
 inline void Animation::update() {
 	if(!animationFlag) return;
@@ -96,6 +98,5 @@ inline int Animation::getSizeX() const { return this->images[this->index]->getSi
 inline int Animation::getSizeY() const { return this->images[this->index]->getSizeY(); }
 inline int Animation::getHandle() const { return this->images[this->index]->getHandle(); }
 inline const Image *Animation::getImage() const { return this->images[this->index]; }
-
-
-
+inline size_t Animation::getInterval() const { return this->interval; }
+inline std::vector<const Image *> *Animation::getParts() { return &this->images; };

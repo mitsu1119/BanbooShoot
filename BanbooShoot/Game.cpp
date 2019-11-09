@@ -22,7 +22,13 @@ void Scene::checkKey() {
 
 // ----------------------------------------------------- Play class -------------------------------------------------------
 Play::Play(std::string stagePath, Player *player, ScreenRect screen): Scene(), player(player), screen(screen) {
+	this->enemyPool.resize(MAX_ENEMY_NUM);
+	for(size_t i = 0; i < MAX_ENEMY_NUM; i++) {
+			this->enemyPool[i] = {false, (Enemy *)std::malloc(sizeof(Enemy))};
+	}
 	loadStage(stagePath);
+	new(std::get<POOL_BODY>(this->enemyPool[0])) Enemy(*this->enemyAnimations["Sphere"]->getParts(), this->enemyAnimations["Sphere"]->getInterval(), 3);
+	std::get<POOL_FLAG>(this->enemyPool[0]) = true;
 }
 
 Play::~Play() {
@@ -56,7 +62,7 @@ bool Play::loadStage(std::string stagePath) {
 		// Load playerimage.
 		_variant_t v;
 		std::string name, path;
-		pList = pRoot->selectNodes("enemyimage");
+		pList = pRoot->selectNodes("//enemyimage");
 		MSXML2::IXMLDOMElementPtr pEnemyImage, pAnimation;
 		MSXML2::IXMLDOMNodeListPtr pAnimations;
 		int sx, sy, width, height;
@@ -98,6 +104,7 @@ int Play::update() {
 	checkKey();
 	keyProcessing();
 	this->player->update();
+	enemyProcessing();
 	return 0;
 }
 
@@ -115,10 +122,19 @@ void Play::keyProcessing() {
 	}
 }
 
+void Play::enemyProcessing() {
+	for(auto &i: this->enemyPool) {
+		if(std::get<POOL_FLAG>(i)) std::get<POOL_BODY>(i)->update();
+	}
+}
+
 void Play::draw() const {
 	ClearDrawScreen();
 
 	this->player->draw();
+	for(auto &i: this->enemyPool) {
+		if(std::get<POOL_FLAG>(i)) std::get<POOL_BODY>(i)->draw();
+	}
 
 	ScreenFlip();
 }
@@ -127,11 +143,11 @@ void Play::draw() const {
 Game::Game(ScreenRect playScreen): playScreen(playScreen) {
 	loadPlayers();
 
-	// The first cene type is play
+	// The first scene type is play
 	this->nowSceneType = SCENE_GAME_1;
 
 	// Use player 0. 
-	this->nowScene = new Play("dat\\stage\\stage1.csv", this->player[0], playScreen);
+	this->nowScene = new Play("dat\\stage\\stage1.xml", this->player[0], playScreen);
 }
 
 Game::~Game() {
