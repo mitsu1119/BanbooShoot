@@ -1,8 +1,10 @@
 #pragma once
-#include <unordered_map>
+#include <numeric>
 #include <string>
 #include <vector>
 #include <tuple>
+#include <unordered_map>
+#include <deque>
 #include <windows.h>
 #import <msxml6.dll>
 #include "Util.h"
@@ -25,6 +27,13 @@ public:
 	virtual void draw() const = 0;
 };
 
+// Stage type.
+enum StagePartTupleTag {
+	STG_NAME, STG_SPEED, STG_TIMING
+};
+typedef std::tuple<std::string, double, int> StagePart;
+typedef std::vector<StagePart> Stage;
+
 // Play class. Actual game disp.
 constexpr size_t MAX_ENEMY_NUM = 10;
 class Play: public Scene {
@@ -33,10 +42,13 @@ private:
 	Player *player;
 
 	// Enemy datas.
-	enum PoolTuple {
+	enum PoolTupleTag {
 		POOL_FLAG, POOL_BODY
 	};
 	std::vector<std::tuple<bool, Enemy *>> enemyPool;
+	std::deque<size_t> falsePoolIndex;		// List of indexes for this->enemyPool with the flag false.
+	Stage stage;
+	size_t enemyCounter;
 
 	// System datas.
 	void keyProcessing();

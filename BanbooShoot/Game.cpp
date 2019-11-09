@@ -21,14 +21,14 @@ void Scene::checkKey() {
 }
 
 // ----------------------------------------------------- Play class -------------------------------------------------------
-Play::Play(std::string stagePath, Player *player, ScreenRect screen): Scene(), player(player), screen(screen) {
+Play::Play(std::string stagePath, Player *player, ScreenRect screen): Scene(), player(player), enemyCounter(0), screen(screen) {
 	this->enemyPool.resize(MAX_ENEMY_NUM);
+	this->falsePoolIndex.resize(MAX_ENEMY_NUM);
+	std::iota(this->falsePoolIndex.begin(), this->falsePoolIndex.end(), 0);
 	for(size_t i = 0; i < MAX_ENEMY_NUM; i++) {
 			this->enemyPool[i] = {false, (Enemy *)std::malloc(sizeof(Enemy))};
 	}
 	loadStage(stagePath);
-	new(std::get<POOL_BODY>(this->enemyPool[0])) Enemy(*this->enemyAnimations["Sphere"]->getParts(), this->enemyAnimations["Sphere"]->getInterval(), 3);
-	std::get<POOL_FLAG>(this->enemyPool[0]) = true;
 }
 
 Play::~Play() {
@@ -62,7 +62,7 @@ bool Play::loadStage(std::string stagePath) {
 		// Load playerimage.
 		_variant_t v;
 		std::string name, path;
-		pList = pRoot->selectNodes("//enemyimage");
+		pList = pRoot->selectNodes("enemyimage");
 		MSXML2::IXMLDOMElementPtr pEnemyImage, pAnimation;
 		MSXML2::IXMLDOMNodeListPtr pAnimations;
 		int sx, sy, width, height;
@@ -95,6 +95,21 @@ bool Play::loadStage(std::string stagePath) {
 			}
 			this->enemyAnimations[name] = new Animation(this->enemyImages[name], enemyImageInterval);
 		}
+		MSXML2::IXMLDOMElementPtr pEnemy;
+		double speed;
+		int timing;
+		pList = pRoot->selectNodes("enemy");
+		this->stage.resize(pList->length);
+		for(int i = 0; i < pList->length; i++) {
+			pEnemy = pList->item[i];
+			v = pEnemy->getAttribute("name");
+			name = _com_util::ConvertBSTRToString(v.bstrVal);
+			v = pEnemy->getAttribute("speed");
+			speed = _wtof(v.bstrVal);
+			v = pEnemy->getAttribute("timing");
+			timing = _wtoi(v.bstrVal);
+			this->stage[i] = {name, speed, timing};
+		}
 	}
 	return true;
 }
@@ -123,6 +138,22 @@ void Play::keyProcessing() {
 }
 
 void Play::enemyProcessing() {
+	// Enemy flag processings.
+	size_t newindex;
+	for(size_t i = this->enemyCounter; i < this->stage.size(); i++) {
+		if(this->counter == std::get<STG_TIMING>(this->stage[i])) {
+			if(this->falsePoolIndex.size() == 0) break;
+			newindex = this->falsePoolIndex.front();
+			this->falsePoolIndex.pop_front();
+			new(std::get<POOL_BODY>(this->enemyPool[newindex])) Enemy(*this->enemyAnimations["Sphere"]->getParts(), this->enemyAnimations["Sphere"]->getInterval(), 3);
+			std::get<POOL_FLAG>(this->enemyPool[newindex]) = true;
+			this->enemyCounter++;
+		} else if(this->counter > std::get<STG_TIMING>(this->stage[i])) {
+			break;
+		}
+	}
+
+	// Enemys' update.
 	for(auto &i: this->enemyPool) {
 		if(std::get<POOL_FLAG>(i)) std::get<POOL_BODY>(i)->update();
 	}
