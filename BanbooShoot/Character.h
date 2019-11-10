@@ -2,6 +2,7 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include "Util.h"
+#include "MovePath.h"
 
 // Base class.
 class Character {
