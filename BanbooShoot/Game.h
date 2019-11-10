@@ -9,6 +9,7 @@
 #import <msxml6.dll>
 #include "Util.h"
 #include "Character.h"
+#include "MovingPath.h"
 
 // Base class
 class Scene {
@@ -49,6 +50,7 @@ private:
 	std::deque<size_t> falsePoolIndex;		// List of indexes for this->enemyPool with the flag false.
 	Stage stage;
 	size_t enemyCounter;
+	MovingPath enemMovePattern;
 
 	// System datas.
 	void keyProcessing();
