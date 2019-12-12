@@ -162,18 +162,21 @@
     <ClCompile Include="Character.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="mitXML.cpp" />
     <ClCompile Include="MovingPath.cpp" />
     <ClCompile Include="Util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Character.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="mitXML.h" />
     <ClInclude Include="MovingPath.h" />
     <ClInclude Include="Util.h" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="dat\database\player.xml" />
     <Xml Include="dat\stage\stage1.xml" />
+    <Xml Include="test.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

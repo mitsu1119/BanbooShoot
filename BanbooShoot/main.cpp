@@ -1,7 +1,22 @@
 #include "DxLib.h"
 #include "Game.h"
 #include "Util.h"
+#include "mitXML.h"
 
+// XML test
+int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) {
+	ChangeWindowMode(true);
+	SetGraphMode(540, 780, 32);
+	if(DxLib_Init() == -1) return -1;
+
+	MITXMLDocument *root;
+	root = new MITXMLDocument("test.xml");
+
+	delete root;
+	DxLib_End();
+	return 0;
+}
+/*
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) {
 	ChangeWindowMode(true);
 	SetGraphMode(540, 780, 32);
@@ -18,3 +33,4 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	DxLib_End();
 	return 0;
 }
+*/
