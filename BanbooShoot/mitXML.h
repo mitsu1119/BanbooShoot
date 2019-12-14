@@ -2,9 +2,10 @@
 #include <fstream>
 #include <vector>
 #include <string>
-#include <unordered_map>
+#include <algorithm>
 
 void strSplit(std::string str, char ch, std::vector<std::string> &res);
+void trim(std::string &s);
 
 class MITXMLDocument;
 class MITXMLNodeList {

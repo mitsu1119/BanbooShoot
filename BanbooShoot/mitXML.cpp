@@ -20,6 +20,7 @@ bool MITXMLDocument::load(const char *fileName) {
 	std::vector<std::string> elems;
 	MITXMLNodeList *currentPtr = this->root;
 	if(getline(ifs, buf)) {
+		trim(buf);
 		strSplit(buf, ' ', elems);
 		elems[0].erase(std::begin(elems[0]));
 		if(elems[0][elems[0].size() - 1] == '>') elems[0].pop_back();
@@ -30,6 +31,7 @@ bool MITXMLDocument::load(const char *fileName) {
 
 	MITXMLNodeList *currentBuf;
 	while(getline(ifs, buf)) {
+		trim(buf);
 		strSplit(buf, ' ', elems);
 		if(elems[0][1] == '/') {
 			if(currentPtr->parent == nullptr) {
@@ -69,4 +71,9 @@ void strSplit(std::string str, char ch, std::vector<std::string> &res) {
 			buf = "";
 		}
 	}
+}
+
+void trim(std::string &s) {
+	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) { return !std::isspace(ch); }));
+	s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) { return !std::isspace(ch); }).base(), s.end());
 }
