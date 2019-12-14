@@ -12,7 +12,7 @@ class MITXMLNodeList {
 private:
 	std::string tagName;
 	MITXMLNodeList *parent;
-	MITXMLNodeList *child;
+	std::vector<MITXMLNodeList *> children;
 
 public:
 	MITXMLNodeList(std::string tagName);

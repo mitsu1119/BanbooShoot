@@ -1,6 +1,6 @@
 #include "mitXML.h"
 
-MITXMLNodeList::MITXMLNodeList(std::string tagName): tagName(tagName), parent(nullptr), child(nullptr) {
+MITXMLNodeList::MITXMLNodeList(std::string tagName): tagName(tagName), parent(nullptr) {
 }
 
 std::ifstream ifs;
@@ -32,17 +32,20 @@ bool MITXMLDocument::load(const char *fileName) {
 	while(getline(ifs, buf)) {
 		strSplit(buf, ' ', elems);
 		if(elems[0][1] == '/') {
-			if(currentPtr->parent == nullptr) break;
+			if(currentPtr->parent == nullptr) {
+				std::vector<std::string>().swap(elems);
+				break;
+			}
 			currentPtr = currentPtr->parent;
 		} else {
 			elems[0].erase(std::begin(elems[0]));
 			if(elems[0][elems[0].size() - 1] == '>') elems[0].pop_back();
 			currentBuf = currentPtr;
 			currentPtr = new MITXMLNodeList(elems[0]);
-			currentPtr->parent = this->root;
-			currentBuf->child = currentPtr;
-			std::vector<std::string>().swap(elems);
+			currentPtr->parent = currentBuf;
+			currentBuf->children.emplace_back(currentPtr);
 		}
+		std::vector<std::string>().swap(elems);
 	}
 
 	return true;
