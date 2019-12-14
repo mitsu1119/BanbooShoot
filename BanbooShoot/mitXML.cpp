@@ -19,19 +19,23 @@ bool MITXMLDocument::load(const char *fileName) {
 
 	std::vector<std::string> elems;
 	MITXMLNodeList *currentPtr = this->root;
-	if(getline(ifs, buf)) {
+	// load root tag
+	while(getline(ifs, buf)) {
 		trim(buf);
+		if(buf == "") continue;		// skip white line
 		strSplit(buf, ' ', elems);
 		elems[0].erase(std::begin(elems[0]));
 		if(elems[0][elems[0].size() - 1] == '>') elems[0].pop_back();
 		this->root = new MITXMLNodeList(elems[0]);
 		currentPtr = this->root;
 		std::vector<std::string>().swap(elems);
+		break;
 	}
 
 	MITXMLNodeList *currentBuf;
 	while(getline(ifs, buf)) {
 		trim(buf);
+		if(buf == "") continue;		// skip white line
 		strSplit(buf, ' ', elems);
 		if(elems[0][1] == '/') {
 			if(currentPtr->parent == nullptr) {
