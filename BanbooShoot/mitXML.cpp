@@ -13,8 +13,21 @@ MITXMLDocument::~MITXMLDocument() {
 }
 
 bool MITXMLDocument::load(const char *fileName) {
-	std::string buf;
-	ifs.open(fileName);
+	FILE *fp;
+	fopen_s(&fp, fileName, "r");
+	std::fseek(fp, 0, SEEK_END);
+	size_t length = ftell(fp);
+	std::fseek(fp, 0, SEEK_SET);
+
+	char *buf = (char *)calloc(1, length + 2);
+	std::fread(buf, length, 1, fp);
+
+	if(length == 0 || buf[length - 1] != '\n') buf[length++] = '\n';
+	buf[length] = '\0';
+	std::fclose(fp);
+	
+	Token *tks = lexer(buf);
+	/*
 	getline(ifs, buf);		// skip the first line
 
 	std::vector<std::string> elems;
@@ -62,6 +75,7 @@ bool MITXMLDocument::load(const char *fileName) {
 		}
 		std::vector<std::string>().swap(elems);
 	}
+	*/
 
 	return true;
 }
@@ -89,4 +103,58 @@ void strSplit(std::string str, char ch, std::vector<std::string> &res) {
 void trim(std::string &s) {
 	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) { return !std::isspace(ch); }));
 	s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) { return !std::isspace(ch); }).base(), s.end());
+}
+
+char checkSingleletterReserved(char p) {
+	// Punctutor.
+	static char spuncts[] = {'"', '<', '>', '/'};
+	for(int i = 0; i < sizeof(spuncts) / sizeof(char); i++) {
+		if(p == spuncts[i]) return spuncts[i];
+	}
+	return 0;
+}
+
+Token::Token(): kind(TK_UNKNOWN), next(nullptr), str(nullptr), len(0) {
+}
+
+Token::Token(TokenKind kind, char *str, int len): kind(kind), str(str), len(len), next(nullptr) {
+}
+
+// lexer
+Token *lexer(char *p) {
+	Token head;
+	head.next = nullptr;
+	Token *current = &head;
+
+	while(*p) {
+		// Skip space.
+		if(std::isspace(*p)) {
+			p++;
+			continue;
+		}
+
+		// Skip block comment.
+		if(!strncmp(p, "<!--", 4)) {
+			char *q = strstr(p + 4, "-->");
+			p = q + 3;
+			continue;
+		}
+
+		char c = checkSingleletterReserved(*p);
+		if(c != 0) {
+			current->next = new Token(TK_RESERVED, p++, 1);
+			current = current->next;
+			continue;
+		}
+
+		if(isalpha(*p) || *p == '_') {
+			char *q = p++;
+			while(isalnum(*p) || *p == '_') p++;
+			current->next = new Token(TK_IDENT, q, p - q);
+			current = current->next;
+			continue;
+		}
+	}
+	current->next = new Token(TK_EOF, p, 1);
+	return head.next;
 }
