@@ -44,12 +44,21 @@ bool MITXMLDocument::load(const char *fileName) {
 			}
 			currentPtr = currentPtr->parent;
 		} else {
-			elems[0].erase(std::begin(elems[0]));
-			if(elems[0][elems[0].size() - 1] == '>') elems[0].pop_back();
-			currentBuf = currentPtr;
-			currentPtr = new MITXMLNodeList(elems[0]);
-			currentPtr->parent = currentBuf;
-			currentBuf->children.emplace_back(currentPtr);
+			if(elems[elems.size() - 1][elems[elems.size() - 1].size() - 2] == '/') {			// <hoge/>
+				elems[0].erase(std::begin(elems[0]));
+				if(elems[0][elems[0].size() - 1] == '>') elems[0].pop_back();
+				if(elems[0][elems[0].size() - 1] == '/') elems[0].pop_back();
+				currentBuf = new MITXMLNodeList(elems[0]);
+				currentPtr->children.emplace_back(currentBuf);
+				currentBuf->parent = currentPtr;
+			} else {																										// <hoge> </hoge>
+				elems[0].erase(std::begin(elems[0]));
+				if(elems[0][elems[0].size() - 1] == '>') elems[0].pop_back();
+				currentBuf = currentPtr;
+				currentPtr = new MITXMLNodeList(elems[0]);
+				currentPtr->parent = currentBuf;
+				currentBuf->children.emplace_back(currentPtr);
+			}
 		}
 		std::vector<std::string>().swap(elems);
 	}
