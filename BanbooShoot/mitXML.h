@@ -32,10 +32,6 @@ public:
 
 Token *lexer(char *p);
 
-/*	
-all = "<!--" STR '-->
-		| '<' STR '/' '>'
-*/
 class MITXMLDocument;
 class MITXMLNodeList {
 	friend MITXMLDocument;
@@ -48,10 +44,27 @@ public:
 	MITXMLNodeList(std::string tagName);
 };
 
-
+// bnf
+/*
+root := '<' STR '>' program '<' '/' STR '>'
+program := ('<' STR '>' program '<' '/' STR '>')*
+*/
 class MITXMLDocument {
 private:
 	MITXMLNodeList *root;
+	Token *nowToken;
+
+	// If next token is expected reserved word, read token and return true.
+	bool consume(const char *op);
+	Token *consumeIdentifier();
+
+	// If next token is expected reserved word, read token. Otherwise output error.
+	void expect(const char *op);
+	Token *expectIdentifier();
+
+	bool isEOF();
+
+	void parse(Token *root);
 
 public:
 	MITXMLDocument(const char *fileName);

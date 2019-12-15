@@ -27,6 +27,11 @@ bool MITXMLDocument::load(const char *fileName) {
 	std::fclose(fp);
 	
 	Token *tks = lexer(buf);
+
+	nowToken = tks;
+
+	// Parsing
+	this->parse(tks);
 	/*
 	getline(ifs, buf);		// skip the first line
 
@@ -78,6 +83,63 @@ bool MITXMLDocument::load(const char *fileName) {
 	*/
 
 	return true;
+}
+
+bool MITXMLDocument::consume(const char *op) {
+	if(nowToken->kind != TK_RESERVED || strlen(op) != nowToken->len || strncmp(nowToken->str, op, nowToken->len)) return false;
+	nowToken = nowToken->next;
+	return true;
+}
+
+Token *MITXMLDocument::consumeIdentifier() {
+	if(nowToken->kind != TK_IDENT) return nullptr;
+	Token *oldToken = nowToken;
+	nowToken = nowToken->next;
+	return oldToken;
+}
+
+void MITXMLDocument::expect(const char *op) {
+	if(nowToken->kind != TK_RESERVED || strlen(op) != nowToken->len || strncmp(nowToken->str, op, nowToken->len)) {
+		std::exit(1);
+	}
+	nowToken = nowToken->next;
+}
+
+Token *MITXMLDocument::expectIdentifier() {
+	if(nowToken->kind != TK_IDENT) std::exit(1);
+	Token *oldToken = nowToken;
+	nowToken = nowToken->next;
+	return oldToken;
+}
+
+bool MITXMLDocument::isEOF() {
+	return nowToken->kind == TK_EOF;
+}
+
+void MITXMLDocument::parse(Token *token) {
+	expect("<");
+	Token *tk = expectIdentifier();
+	this->root = new MITXMLNodeList(std::string(tk->str, tk->len));
+	expect(">");
+
+	MITXMLNodeList *currentPtr = this->root;
+	MITXMLNodeList *currentBuf;
+	while(!isEOF()) {
+		expect("<");
+		tk = consumeIdentifier();
+		if(tk != nullptr) {			// <hoge>
+			expect(">");
+			currentBuf = currentPtr;
+			currentPtr = new MITXMLNodeList(std::string(tk->str, tk->len));
+			currentPtr->parent = currentBuf;
+			currentBuf->children.emplace_back(currentPtr);
+		} else {
+			expect("/");				//	</hoge>
+			expectIdentifier();
+			expect(">");
+			if(currentPtr->parent != nullptr) currentPtr = currentPtr->parent;
+		}
+	}
 }
 
 void strSplit(std::string str, char ch, std::vector<std::string> &res) {	
