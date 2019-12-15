@@ -6,14 +6,13 @@
 #include <cstdio>
 #include <cstdlib>
 #include <algorithm>
-
-void strSplit(std::string str, char ch, std::vector<std::string> &res);
-void trim(std::string &s);
+#include <unordered_map>
 
 // Token data.
 typedef enum {
 	TK_RESERVED,
 	TK_IDENT,
+	TK_ELEMENTVAL,
 	TK_EOF,
 	TK_UNKNOWN
 } TokenKind;
@@ -39,6 +38,8 @@ private:
 	std::string tagName;
 	MITXMLNodeList *parent;
 	std::vector<MITXMLNodeList *> children;
+	std::unordered_map<std::string, std::string> elements;
+
 
 public:
 	MITXMLNodeList(std::string tagName);
@@ -46,8 +47,8 @@ public:
 
 // bnf
 /*
-root := '<' STR '>' program '<' '/' STR '>'
-program := ('<' STR '>' program '<' '/' STR '>')*
+root := (program)+
+program := '<' STR (STR '=' '"' STR '"')* '>' program '<' '/' STR '>'
 */
 class MITXMLDocument {
 private:
@@ -61,6 +62,7 @@ private:
 	// If next token is expected reserved word, read token. Otherwise output error.
 	void expect(const char *op);
 	Token *expectIdentifier();
+	Token *expectElementVal();
 
 	bool isEOF();
 
