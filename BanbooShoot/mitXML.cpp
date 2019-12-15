@@ -144,6 +144,13 @@ Token *lexer(char *p) {
 			continue;
 		}
 
+		// Skip xml declaration
+		if(!strncmp(p, "<?", 2)) {
+			char *q = strstr(p + 2, ">");
+			p = q + 1;
+			continue;
+		}
+
 		char c = checkSingleletterReserved(*p);
 
 		// element
