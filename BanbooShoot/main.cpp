@@ -12,6 +12,10 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	MITXMLDocument *root;
 	root = new MITXMLDocument("test.xml");
 
+	MITXMLElement *pRoot = root->selectRootNode();
+	std::string elem = pRoot->getAttribute("elem");
+	std::string elem2 = pRoot->getAttribute("elem2");
+
 	delete root;
 	DxLib_End();
 	return 0;

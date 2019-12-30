@@ -3,6 +3,10 @@
 MITXMLElement::MITXMLElement(std::string tagName): tagName(tagName), parent(nullptr) {
 }
 
+std::string MITXMLElement::getAttribute(std::string attrName) const {
+	return this->attributes.at(attrName);
+}
+
 std::ifstream ifs;
 MITXMLDocument::MITXMLDocument(const char *fileName) {
 	this->load(fileName);
@@ -34,6 +38,10 @@ bool MITXMLDocument::load(const char *fileName) {
 	this->parse(tks);
 
 	return true;
+}
+
+MITXMLElement *MITXMLDocument::selectRootNode() const {
+	return this->root;
 }
 
 bool MITXMLDocument::consume(const char *op) {
@@ -78,10 +86,15 @@ void MITXMLDocument::parse(Token *token) {
 	expect("<");
 	Token *tk = expectIdentifier();
 	this->root = new MITXMLElement(std::string(tk->str, tk->len));
-	expect(">");
 
 	MITXMLElement *currentPtr = this->root;
 	MITXMLElement *currentBuf;
+
+	/* The processing after "<root " needs to be changed depending on the type of the root tag.
+	 * So, the latter part is processed like a normal tag.
+	 */
+	goto PARSE_ROOT_END;
+
 	while(!isEOF()) {
 		expect("<");
 		tk = consumeIdentifier();
@@ -90,13 +103,14 @@ void MITXMLDocument::parse(Token *token) {
 			currentPtr = new MITXMLElement(std::string(tk->str, tk->len));
 			currentPtr->parent = currentBuf;
 			currentBuf->children.emplace_back(currentPtr);
+PARSE_ROOT_END:
 
-			// elements
+			// attributes
 			tk = consumeIdentifier();
 			while(tk != nullptr) {
 				expect("=");
 				Token *elemVal = expectElementVal();
-				currentPtr->elements[std::string(tk->str, tk->len)] = std::string(elemVal->str, elemVal->len);
+				currentPtr->attributes[std::string(tk->str, tk->len)] = std::string(elemVal->str, elemVal->len);
 				tk = consumeIdentifier();
 			}
 			expect(">");

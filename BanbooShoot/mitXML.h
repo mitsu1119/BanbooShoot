@@ -31,6 +31,9 @@ public:
 
 Token *lexer(char *p);
 
+/* MITXMLElement class
+ * This class means each tag.
+ */
 class MITXMLDocument;
 class MITXMLElement {
 	friend MITXMLDocument;
@@ -38,11 +41,13 @@ private:
 	std::string tagName;
 	MITXMLElement *parent;
 	std::vector<MITXMLElement *> children;
-	std::unordered_map<std::string, std::string> elements;
-
+	std::unordered_map<std::string, std::string> attributes;
 
 public:
 	MITXMLElement(std::string tagName);
+
+	/* get attribute value named @attrName */
+	std::string getAttribute(std::string attrName) const;
 };
 
 // bnf
@@ -72,5 +77,9 @@ public:
 	MITXMLDocument(const char *fileName);
 	~MITXMLDocument();
 	
+	/* parsing and loading */
 	bool load(const char *fileName);
+
+	/* return root node */
+	MITXMLElement *selectRootNode() const;
 };
