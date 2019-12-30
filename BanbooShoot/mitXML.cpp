@@ -122,6 +122,12 @@ PARSE_ROOT_END:
 				currentPtr->attributes[std::string(tk->str, tk->len)] = std::string(elemVal->str, elemVal->len);
 				tk = consumeIdentifier();
 			}
+
+			if(consume("/")) {		// <hoge />
+				expect(">");
+				if(currentPtr->parent != nullptr) currentPtr = currentPtr->parent;
+				continue;
+			}
 			expect(">");
 		} else {
 			expect("/");				//	</hoge>

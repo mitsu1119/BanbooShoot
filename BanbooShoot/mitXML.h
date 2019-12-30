@@ -67,6 +67,7 @@ public:
 /* bnf
  * root := (program)+
  * program := '<' STR (STR '=' '"' STR '"')* '>' program '<' '/' STR '>'
+ *                  | '<' STR (STR '=' '"' STR '"')* '/' '>' 
  */
 class MITXMLDocument {
 private:

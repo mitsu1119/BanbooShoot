@@ -9,7 +9,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	SetGraphMode(540, 780, 32);
 	if(DxLib_Init() == -1) return -1;
 
-	MITXMLDocument root("test.xml");
+	MITXMLDocument root("dat\\database\\player.xml");
 
 	MITXMLElement *pRoot = root.selectRootNode();
 	MITXMLNodeList pList = pRoot->selectNode("tag1");
