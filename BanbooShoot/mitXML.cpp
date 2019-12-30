@@ -1,6 +1,6 @@
 #include "mitXML.h"
 
-MITXMLNodeList::MITXMLNodeList(std::string tagName): tagName(tagName), parent(nullptr) {
+MITXMLElement::MITXMLElement(std::string tagName): tagName(tagName), parent(nullptr) {
 }
 
 std::ifstream ifs;
@@ -77,17 +77,17 @@ bool MITXMLDocument::isEOF() {
 void MITXMLDocument::parse(Token *token) {
 	expect("<");
 	Token *tk = expectIdentifier();
-	this->root = new MITXMLNodeList(std::string(tk->str, tk->len));
+	this->root = new MITXMLElement(std::string(tk->str, tk->len));
 	expect(">");
 
-	MITXMLNodeList *currentPtr = this->root;
-	MITXMLNodeList *currentBuf;
+	MITXMLElement *currentPtr = this->root;
+	MITXMLElement *currentBuf;
 	while(!isEOF()) {
 		expect("<");
 		tk = consumeIdentifier();
 		if(tk != nullptr) {			// <hoge>
 			currentBuf = currentPtr;
-			currentPtr = new MITXMLNodeList(std::string(tk->str, tk->len));
+			currentPtr = new MITXMLElement(std::string(tk->str, tk->len));
 			currentPtr->parent = currentBuf;
 			currentBuf->children.emplace_back(currentPtr);
 

@@ -32,27 +32,27 @@ public:
 Token *lexer(char *p);
 
 class MITXMLDocument;
-class MITXMLNodeList {
+class MITXMLElement {
 	friend MITXMLDocument;
 private:
 	std::string tagName;
-	MITXMLNodeList *parent;
-	std::vector<MITXMLNodeList *> children;
+	MITXMLElement *parent;
+	std::vector<MITXMLElement *> children;
 	std::unordered_map<std::string, std::string> elements;
 
 
 public:
-	MITXMLNodeList(std::string tagName);
+	MITXMLElement(std::string tagName);
 };
 
 // bnf
 /*
-root := (program)+
-program := '<' STR (STR '=' '"' STR '"')* '>' program '<' '/' STR '>'
-*/
+ * root := (program)+
+ * program := '<' STR (STR '=' '"' STR '"')* '>' program '<' '/' STR '>'
+ */
 class MITXMLDocument {
 private:
-	MITXMLNodeList *root;
+	MITXMLElement *root;
 	Token *nowToken;
 
 	// If next token is expected reserved word, read token and return true.
