@@ -35,6 +35,7 @@ Token *lexer(char *p);
  * This class means each tag.
  */
 class MITXMLDocument;
+class MITXMLNodeList;
 class MITXMLElement {
 	friend MITXMLDocument;
 private:
@@ -48,10 +49,22 @@ public:
 
 	/* get attribute value named @attrName */
 	std::string getAttribute(std::string attrName) const;
+
+	/* return node list */
+	// Search only root level.
+	MITXMLNodeList selectNode(std::string nodeName) const;
 };
 
-// bnf
-/*
+/* MITXMLNodeList class
+ * This class have many same name tags.
+ */
+class MITXMLNodeList {
+private:
+public:
+	std::vector<MITXMLElement *> item;
+};
+
+/* bnf
  * root := (program)+
  * program := '<' STR (STR '=' '"' STR '"')* '>' program '<' '/' STR '>'
  */

@@ -9,14 +9,12 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	SetGraphMode(540, 780, 32);
 	if(DxLib_Init() == -1) return -1;
 
-	MITXMLDocument *root;
-	root = new MITXMLDocument("test.xml");
+	MITXMLDocument root("test.xml");
 
-	MITXMLElement *pRoot = root->selectRootNode();
-	std::string elem = pRoot->getAttribute("elem");
-	std::string elem2 = pRoot->getAttribute("elem2");
+	MITXMLElement *pRoot = root.selectRootNode();
+	MITXMLNodeList pList = pRoot->selectNode("tag1");
+	std::string elem = pList.item[0]->getAttribute("elem");
 
-	delete root;
 	DxLib_End();
 	return 0;
 }

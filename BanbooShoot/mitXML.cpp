@@ -7,6 +7,15 @@ std::string MITXMLElement::getAttribute(std::string attrName) const {
 	return this->attributes.at(attrName);
 }
 
+MITXMLNodeList MITXMLElement::selectNode(std::string nodeName) const {
+	MITXMLNodeList nodelist;
+	for(auto &i: this->children) {
+		if(i->tagName == nodeName) nodelist.item.emplace_back(i);
+	}
+
+	return nodelist;
+}
+
 std::ifstream ifs;
 MITXMLDocument::MITXMLDocument(const char *fileName) {
 	this->load(fileName);
