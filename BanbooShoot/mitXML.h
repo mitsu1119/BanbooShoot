@@ -52,7 +52,7 @@ public:
 
 	/* return node list */
 	// Search only root level.
-	MITXMLNodeList selectNode(std::string nodeName) const;
+	MITXMLNodeList selectNodes(std::string nodeName) const;
 };
 
 /* MITXMLNodeList class
@@ -62,6 +62,7 @@ class MITXMLNodeList {
 private:
 public:
 	std::vector<MITXMLElement *> item;
+	size_t length() const;
 };
 
 /* bnf

@@ -10,6 +10,7 @@
 #include "Util.h"
 #include "Character.h"
 #include "MovingPath.h"
+#include "mitXML.h"
 
 // Base class
 class Scene {

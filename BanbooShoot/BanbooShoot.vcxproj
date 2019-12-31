@@ -176,7 +176,6 @@
   <ItemGroup>
     <Xml Include="dat\database\player.xml" />
     <Xml Include="dat\stage\stage1.xml" />
-    <Xml Include="test.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

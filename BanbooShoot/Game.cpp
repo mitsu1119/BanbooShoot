@@ -42,6 +42,8 @@ Play::~Play() {
 	}
 }
 
+// using MSXML
+/*
 bool Play::loadStage(std::string stagePath) {
 	MSXML2::IXMLDOMDocument2Ptr pDocument;
 	HRESULT hr = pDocument.CreateInstance(__uuidof(MSXML2::DOMDocument60), NULL, CLSCTX_INPROC_SERVER);
@@ -113,6 +115,91 @@ bool Play::loadStage(std::string stagePath) {
 	}
 	return true;
 }
+*/
+
+// non MSXML
+bool Play::loadStage(std::string stagePath) {
+	MITXMLDocument pDocument(stagePath.c_str());
+
+	// Search root tag.
+	MITXMLElement *pRoot = pDocument.selectRootNode();
+
+	// Load playerimages.
+	std::string name, path;
+	MITXMLNodeList pList = pRoot->selectNodes("enemyimage");
+
+	MITXMLElement *pEnemyImage, *pAnimation;
+	std::string value;
+	int sx, sy, width, height, enemyImageInterval;
+	for(size_t i = 0; i < pList.length(); i++) {
+		pEnemyImage = pList.item[i];
+		name = pEnemyImage->getAttribute("name");
+		path = pEnemyImage->getAttribute("path");
+
+		// TODO: Check getAttribute() for NULL, and if NULL, it is necessary to initialize with an appropriate value
+		/* 			if(v.vt != VT_NULL) enemyImageInterval = _wtoi(v.bstrVal);
+			else enemyImageInterval = 100;
+			*/
+		enemyImageInterval = std::stoi(pEnemyImage->getAttribute("animinterval"));
+	}
+}
+
+/*
+		// Load playerimage.
+		_variant_t v;
+		std::string name, path;
+		pList = pRoot->selectNodes("enemyimage");
+		MSXML2::IXMLDOMElementPtr pEnemyImage, pAnimation;
+		MSXML2::IXMLDOMNodeListPtr pAnimations;
+		int sx, sy, width, height;
+		int enemyImageInterval;
+		for(int i = 0; i < pList->length; i++) {
+			pEnemyImage = pList->item[i];
+			v = pEnemyImage->getAttribute("name");
+			name = _com_util::ConvertBSTRToString(v.bstrVal);
+			v = pEnemyImage->getAttribute("path");
+			path = _com_util::ConvertBSTRToString(v.bstrVal);
+			v = pEnemyImage->getAttribute("animinterval");
+			if(v.vt != VT_NULL) enemyImageInterval = _wtoi(v.bstrVal);
+			else enemyImageInterval = 100;
+			pAnimations = pEnemyImage->selectNodes("animation");
+			if(pAnimations->length != 0) {
+				for(int j = 0; j < pAnimations->length; j++) {
+					pAnimation = pAnimations->item[j];
+					v = pAnimation->getAttribute("sx");
+					sx = _wtoi(v.bstrVal);
+					v = pAnimation->getAttribute("sy");
+					sy = _wtoi(v.bstrVal);
+					v = pAnimation->getAttribute("width");
+					width = _wtoi(v.bstrVal);
+					v = pAnimation->getAttribute("height");
+					height = _wtoi(v.bstrVal);
+					this->enemyImages[name].emplace_back(new Image(path.c_str(), sx, sy, width, height));
+				}
+			} else {
+				this->enemyImages[name].emplace_back(new Image(path.c_str()));
+			}
+			this->enemyAnimations[name] = new Animation(this->enemyImages[name], enemyImageInterval);
+		}
+		MSXML2::IXMLDOMElementPtr pEnemy;
+		double speed;
+		int timing;
+		pList = pRoot->selectNodes("enemy");
+		this->stage.resize(pList->length);
+		for(int i = 0; i < pList->length; i++) {
+			pEnemy = pList->item[i];
+			v = pEnemy->getAttribute("name");
+			name = _com_util::ConvertBSTRToString(v.bstrVal);
+			v = pEnemy->getAttribute("speed");
+			speed = _wtof(v.bstrVal);
+			v = pEnemy->getAttribute("timing");
+			timing = _wtoi(v.bstrVal);
+			this->stage[i] = {name, speed, timing};
+		}
+	}
+	return true;
+}
+*/
 
 int Play::update() {
 	this->counter++;

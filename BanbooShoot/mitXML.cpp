@@ -7,13 +7,17 @@ std::string MITXMLElement::getAttribute(std::string attrName) const {
 	return this->attributes.at(attrName);
 }
 
-MITXMLNodeList MITXMLElement::selectNode(std::string nodeName) const {
+MITXMLNodeList MITXMLElement::selectNodes(std::string nodeName) const {
 	MITXMLNodeList nodelist;
 	for(auto &i: this->children) {
 		if(i->tagName == nodeName) nodelist.item.emplace_back(i);
 	}
 
 	return nodelist;
+}
+
+size_t MITXMLNodeList::length() const {
+	return this->item.size();
 }
 
 std::ifstream ifs;
