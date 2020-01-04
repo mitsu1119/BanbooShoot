@@ -8,6 +8,10 @@
 #include <algorithm>
 #include <unordered_map>
 
+// err num
+#define E_OK 0
+#define E_NULL 1
+
 // Token data.
 typedef enum {
 	TK_RESERVED,
@@ -49,6 +53,7 @@ public:
 
 	/* get attribute value named @attrName */
 	std::string getAttribute(std::string attrName) const;
+	std::string getAttribute(std::string attrName, int *err);
 
 	/* return node list */
 	// Search only root level.

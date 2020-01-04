@@ -53,18 +53,16 @@ bool Play::loadStage(std::string stagePath) {
 	MITXMLNodeList pList = pRoot->selectNodes("enemyimage");
 
 	MITXMLElement *pEnemyImage, *pAnimation;
-	std::string value;
-	int sx, sy, width, height, enemyImageInterval;
+	std::string value, buf;
+	int sx, sy, width, height, enemyImageInterval, err;
 	for(size_t i = 0; i < pList.length(); i++) {
 		pEnemyImage = pList.item[i];
 		name = pEnemyImage->getAttribute("name");
 		path = pEnemyImage->getAttribute("path");
-
-		// TODO: Check getAttribute() for NULL, and if NULL, it is necessary to initialize with an appropriate value
-		// 			if(v.vt != VT_NULL) enemyImageInterval = _wtoi(v.bstrVal);
-		// else enemyImageInterval = 100;
-			
-		enemyImageInterval = std::stoi(pEnemyImage->getAttribute("animinterval"));
+		
+		buf = pEnemyImage->getAttribute("animinterval", &err);
+		if(err != E_NULL) enemyImageInterval = std::stoi(buf);
+		else enemyImageInterval = 100;
 
 		MITXMLNodeList pAnimations = pEnemyImage->selectNodes("animation");
 		if(pAnimations.length() != 0) {
@@ -181,8 +179,8 @@ bool Game::loadPlayers() {
 	MITXMLElement *pRoot = pDocument.selectRootNode();
 
 	// Load playerimages.
-	std::string name, path;
-	int sx, sy, width, height;
+	std::string name, path, buf;
+	int sx, sy, width, height, err;
 	std::unordered_map<std::string, int> playerImagesInterval;
 	MITXMLElement *pPlayerImage, *pAnimation;
 	MITXMLNodeList pList = pRoot->selectNodes("playerimage");
@@ -191,10 +189,9 @@ bool Game::loadPlayers() {
 		name = pPlayerImage->getAttribute("name");
 		path = pPlayerImage->getAttribute("path");
 
-		// TODO: Check getAttribute() for NULL, and if NULL, it is necessary to initialize with an appropriate value
-		// 			if(v.vt != VT_NULL) enemyImageInterval = _wtoi(v.bstrVal);
-		// else enemyImageInterval = 100;
-		playerImagesInterval[name] = std::stoi(pPlayerImage->getAttribute("animinterval"));
+		buf = pPlayerImage->getAttribute("animinterval", &err);
+		if(err != E_NULL) playerImagesInterval[name] = std::stoi(buf);
+		else playerImagesInterval[name] = 100;
 		
 		MITXMLNodeList pAnimations = pPlayerImage->selectNodes("animation");
 		if(pAnimations.length() != 0) {
@@ -221,9 +218,14 @@ bool Game::loadPlayers() {
 		name = pPlayerDefine->getAttribute("name");
 		speed = std::stof(pPlayerDefine->getAttribute("speed"));
 
-		// TODO: Check getAttribute() for NULL, and if NULL, it is necessary to initialize with an appropriate value
-		leftName = pPlayerDefine->getAttribute("leftname");
-		rightName = pPlayerDefine->getAttribute("rightname");
+		buf = pPlayerDefine->getAttribute("leftname", &err);
+		if(err != E_NULL) leftName = buf;
+		else leftName = name;
+
+		buf = pPlayerDefine->getAttribute("rightname", &err);
+		if(err != E_NULL) rightName = buf;
+		else rightName = name;
+
 		this->player.emplace_back(new Player(this->playerImages[name], this->playerImages[leftName], this->playerImages[rightName], playerImagesInterval[name], speed));
 	}
 	return true;

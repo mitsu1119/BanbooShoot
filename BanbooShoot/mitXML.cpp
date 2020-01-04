@@ -7,6 +7,16 @@ std::string MITXMLElement::getAttribute(std::string attrName) const {
 	return this->attributes.at(attrName);
 }
 
+std::string MITXMLElement::getAttribute(std::string attrName, int *err) {
+	if(!this->attributes.count(attrName)) {
+		*err = E_NULL;
+		return "";
+	} else {
+		*err = E_OK;
+		return this->attributes.at(attrName);
+	}
+}
+
 MITXMLNodeList MITXMLElement::selectNodes(std::string nodeName) const {
 	MITXMLNodeList nodelist;
 	for(auto &i: this->children) {
