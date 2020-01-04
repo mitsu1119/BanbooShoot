@@ -16,8 +16,8 @@
 		<animation sx="150" sy="120" width="50" height="60" />
 	</playerimage>
 	
-	<playerimage name="Shirokami_chann_left" path="dat\\image\\player\\ShirokamiLeft.png" />
-	<playerimage name="Shirokami_chann_right" path="dat\\image\\player\\ShirokamiRight.png" />
+	<playerimage name="Shirokami_chann_left" path="dat\\image\\player\\ShirokamiLeft.png" animinterval="8"/>
+	<playerimage name="Shirokami_chann_right" path="dat\\image\\player\\ShirokamiRight.png" animinterval="8"/>
 		
 	<!-- プレイヤーの定義 -->
 	<playerdefine name="Shirokami_chann" leftname="Shirokami_chann_left" rightname="Shirokami_chann_right" speed="5" />

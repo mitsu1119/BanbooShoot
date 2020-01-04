@@ -6,7 +6,6 @@
 #include <unordered_map>
 #include <deque>
 #include <windows.h>
-#import <msxml6.dll>
 #include "Util.h"
 #include "Character.h"
 #include "MovingPath.h"

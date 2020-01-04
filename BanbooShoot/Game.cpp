@@ -42,89 +42,13 @@ Play::~Play() {
 	}
 }
 
-// using MSXML
-/*
-bool Play::loadStage(std::string stagePath) {
-	MSXML2::IXMLDOMDocument2Ptr pDocument;
-	HRESULT hr = pDocument.CreateInstance(__uuidof(MSXML2::DOMDocument60), NULL, CLSCTX_INPROC_SERVER);
-	if(FAILED(hr)) return false;
-
-	pDocument->async = VARIANT_FALSE;
-	pDocument->validateOnParse = VARIANT_FALSE;
-	pDocument->resolveExternals = VARIANT_FALSE;
-	pDocument->preserveWhiteSpace = VARIANT_FALSE;
-
-	if(pDocument->load(stagePath.c_str()) == VARIANT_TRUE) {
-		// Search root tag.
-		MSXML2::IXMLDOMNodeListPtr pList = pDocument->selectNodes("stage");
-		MSXML2::IXMLDOMElementPtr pRoot;
-		if(pList->length > 0) pRoot = pList->item[0];
-		else return false;
-
-		// Load playerimage.
-		_variant_t v;
-		std::string name, path;
-		pList = pRoot->selectNodes("enemyimage");
-		MSXML2::IXMLDOMElementPtr pEnemyImage, pAnimation;
-		MSXML2::IXMLDOMNodeListPtr pAnimations;
-		int sx, sy, width, height;
-		int enemyImageInterval;
-		for(int i = 0; i < pList->length; i++) {
-			pEnemyImage = pList->item[i];
-			v = pEnemyImage->getAttribute("name");
-			name = _com_util::ConvertBSTRToString(v.bstrVal);
-			v = pEnemyImage->getAttribute("path");
-			path = _com_util::ConvertBSTRToString(v.bstrVal);
-			v = pEnemyImage->getAttribute("animinterval");
-			if(v.vt != VT_NULL) enemyImageInterval = _wtoi(v.bstrVal);
-			else enemyImageInterval = 100;
-			pAnimations = pEnemyImage->selectNodes("animation");
-			if(pAnimations->length != 0) {
-				for(int j = 0; j < pAnimations->length; j++) {
-					pAnimation = pAnimations->item[j];
-					v = pAnimation->getAttribute("sx");
-					sx = _wtoi(v.bstrVal);
-					v = pAnimation->getAttribute("sy");
-					sy = _wtoi(v.bstrVal);
-					v = pAnimation->getAttribute("width");
-					width = _wtoi(v.bstrVal);
-					v = pAnimation->getAttribute("height");
-					height = _wtoi(v.bstrVal);
-					this->enemyImages[name].emplace_back(new Image(path.c_str(), sx, sy, width, height));
-				}
-			} else {
-				this->enemyImages[name].emplace_back(new Image(path.c_str()));
-			}
-			this->enemyAnimations[name] = new Animation(this->enemyImages[name], enemyImageInterval);
-		}
-		MSXML2::IXMLDOMElementPtr pEnemy;
-		double speed;
-		int timing;
-		pList = pRoot->selectNodes("enemy");
-		this->stage.resize(pList->length);
-		for(int i = 0; i < pList->length; i++) {
-			pEnemy = pList->item[i];
-			v = pEnemy->getAttribute("name");
-			name = _com_util::ConvertBSTRToString(v.bstrVal);
-			v = pEnemy->getAttribute("speed");
-			speed = _wtof(v.bstrVal);
-			v = pEnemy->getAttribute("timing");
-			timing = _wtoi(v.bstrVal);
-			this->stage[i] = {name, speed, timing};
-		}
-	}
-	return true;
-}
-*/
-
-// non MSXML
 bool Play::loadStage(std::string stagePath) {
 	MITXMLDocument pDocument(stagePath.c_str());
 
 	// Search root tag.
 	MITXMLElement *pRoot = pDocument.selectRootNode();
 
-	// Load playerimages.
+	// Load enemyimages.
 	std::string name, path;
 	MITXMLNodeList pList = pRoot->selectNodes("enemyimage");
 
@@ -158,30 +82,21 @@ bool Play::loadStage(std::string stagePath) {
 		this->enemyAnimations[name] = new Animation(this->enemyImages[name], enemyImageInterval);
 	}
 
-	return true;
-}
-
-/*
-		// Load playerimage.
-		MSXML2::IXMLDOMElementPtr pEnemy;
-		double speed;
-		int timing;
-		pList = pRoot->selectNodes("enemy");
-		this->stage.resize(pList->length);
-		for(int i = 0; i < pList->length; i++) {
-			pEnemy = pList->item[i];
-			v = pEnemy->getAttribute("name");
-			name = _com_util::ConvertBSTRToString(v.bstrVal);
-			v = pEnemy->getAttribute("speed");
-			speed = _wtof(v.bstrVal);
-			v = pEnemy->getAttribute("timing");
-			timing = _wtoi(v.bstrVal);
-			this->stage[i] = {name, speed, timing};
-		}
+	MITXMLElement *pEnemy;
+	double speed;
+	int timing;
+	pList = pRoot->selectNodes("enemy");
+	this->stage.resize(pList.length());
+	for(size_t i = 0; i < pList.length(); i++) {
+		pEnemy = pList.item[i];
+		name = pEnemy->getAttribute("name");
+		speed = std::stof(pEnemy->getAttribute("speed"));
+		timing = std::stoi(pEnemy->getAttribute("timing"));
+		this->stage[i] = {name, speed, timing};
 	}
+
 	return true;
 }
-*/
 
 int Play::update() {
 	this->counter++;
@@ -260,77 +175,56 @@ Game::~Game() {
 }
 
 bool Game::loadPlayers() {
-	MSXML2::IXMLDOMDocument2Ptr pDocument;
-	HRESULT hr = pDocument.CreateInstance(__uuidof(MSXML2::DOMDocument60), NULL, CLSCTX_INPROC_SERVER);
-	if(FAILED(hr)) return false;
+	MITXMLDocument pDocument("dat\\database\\player.xml");
 
-	pDocument->async = VARIANT_FALSE;
-	pDocument->validateOnParse = VARIANT_FALSE;
-	pDocument->resolveExternals = VARIANT_FALSE;
-	pDocument->preserveWhiteSpace = VARIANT_FALSE;
+	// Search root tag.
+	MITXMLElement *pRoot = pDocument.selectRootNode();
 
-	if(pDocument->load("dat\\database\\player.xml") == VARIANT_TRUE) {
-		// Search root tag.
-		MSXML2::IXMLDOMNodeListPtr pList = pDocument->selectNodes("player");
-		MSXML2::IXMLDOMElementPtr pRoot;
-		if(pList->length > 0) pRoot = pList->item[0];
-		else return false;
-			
-		// Load playerimage.
-		_variant_t v;
-		std::string name, path;
-		pList = pRoot->selectNodes("//playerimage");
-		MSXML2::IXMLDOMElementPtr pPlayerImage, pAnimation;
-		MSXML2::IXMLDOMNodeListPtr pAnimations;
-		int sx, sy, width, height;
-		std::unordered_map<std::string, int> playerImagesInterval;
-		for(int i = 0; i < pList->length; i++) {
-			pPlayerImage = pList->item[i];
-			v = pPlayerImage->getAttribute("name");
-			name = _com_util::ConvertBSTRToString(v.bstrVal);
-			v = pPlayerImage->getAttribute("path");
-			path = _com_util::ConvertBSTRToString(v.bstrVal);
-			v = pPlayerImage->getAttribute("animinterval");
-			if(v.vt != VT_NULL) playerImagesInterval[name] = _wtoi(v.bstrVal);
-			else playerImagesInterval[name] = 100;
-			pAnimations = pPlayerImage->selectNodes("animation");
-			if(pAnimations->length != 0) {
-				for(int j = 0; j < pAnimations->length; j++) {
-					pAnimation = pAnimations->item[j];
-					v = pAnimation->getAttribute("sx");
-					sx = _wtoi(v.bstrVal);
-					v = pAnimation->getAttribute("sy");
-					sy = _wtoi(v.bstrVal);
-					v = pAnimation->getAttribute("width");
-					width = _wtoi(v.bstrVal);
-					v = pAnimation->getAttribute("height");
-					height = _wtoi(v.bstrVal);
-					this->playerImages[name].emplace_back(new Image(path.c_str(), sx, sy, width, height));
-				}
-			} else {
-				this->playerImages[name].emplace_back(new Image(path.c_str()));
+	// Load playerimages.
+	std::string name, path;
+	int sx, sy, width, height;
+	std::unordered_map<std::string, int> playerImagesInterval;
+	MITXMLElement *pPlayerImage, *pAnimation;
+	MITXMLNodeList pList = pRoot->selectNodes("playerimage");
+	for(size_t i = 0; i < pList.length(); i++) {
+		pPlayerImage = pList.item[i];
+		name = pPlayerImage->getAttribute("name");
+		path = pPlayerImage->getAttribute("path");
+
+		// TODO: Check getAttribute() for NULL, and if NULL, it is necessary to initialize with an appropriate value
+		// 			if(v.vt != VT_NULL) enemyImageInterval = _wtoi(v.bstrVal);
+		// else enemyImageInterval = 100;
+		playerImagesInterval[name] = std::stoi(pPlayerImage->getAttribute("animinterval"));
+		
+		MITXMLNodeList pAnimations = pPlayerImage->selectNodes("animation");
+		if(pAnimations.length() != 0) {
+			for(size_t j = 0; j < pAnimations.length(); j++) {
+				pAnimation = pAnimations.item[j];
+				sx = std::stoi(pAnimation->getAttribute("sx"));
+				sy = std::stoi(pAnimation->getAttribute("sy"));
+				width = std::stoi(pAnimation->getAttribute("width"));
+				height = std::stoi(pAnimation->getAttribute("height"));
+				this->playerImages[name].emplace_back(new Image(path.c_str(), sx, sy, width, height));
 			}
+		} else {
+			this->playerImages[name].emplace_back(new Image(path.c_str()));
 		}
+	}
 
-		// Load playerdefine.
-		pList = pRoot->selectNodes("//playerdefine");
-		MSXML2::IXMLDOMElementPtr pPlayerDefine;
-		std::string leftName, rightName;
-		double speed;
-		for(int i = 0; i < pList->length; i++) {
-			pPlayerDefine = pList->item[i];
-			v = pPlayerDefine->getAttribute("name");
-			name = _com_util::ConvertBSTRToString(v.bstrVal);
-			v = pPlayerDefine->getAttribute("speed");
-			speed = _wtof(v.bstrVal);
-			v = pPlayerDefine->getAttribute("leftname");
-			if(v.vt != VT_NULL) leftName = _com_util::ConvertBSTRToString(v.bstrVal);
-			else leftName = name;
-			v = pPlayerDefine->getAttribute("rightname");
-			if(v.vt != VT_NULL) rightName = _com_util::ConvertBSTRToString(v.bstrVal);
-			else rightName = name;
-			this->player.emplace_back(new Player(this->playerImages[name], this->playerImages[leftName], this->playerImages[rightName], playerImagesInterval[name], speed));
-		}
+	// Load playerdefines.
+	std::string leftName, rightName;
+	double speed;
+	MITXMLElement *pPlayerDefine;
+	pList = pRoot->selectNodes("playerdefine");
+	for(size_t i = 0; i < pList.length(); i++) {
+		pPlayerDefine = pList.item[i];
+		name = pPlayerDefine->getAttribute("name");
+		speed = std::stof(pPlayerDefine->getAttribute("speed"));
+
+		// TODO: Check getAttribute() for NULL, and if NULL, it is necessary to initialize with an appropriate value
+		leftName = pPlayerDefine->getAttribute("leftname");
+		rightName = pPlayerDefine->getAttribute("rightname");
+		this->player.emplace_back(new Player(this->playerImages[name], this->playerImages[leftName], this->playerImages[rightName], playerImagesInterval[name], speed));
 	}
 	return true;
 }
