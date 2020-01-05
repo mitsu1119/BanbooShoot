@@ -82,7 +82,7 @@ bool Play::loadStage(std::string stagePath) {
 
 	MITXMLElement *pEnemy;
 	double speed;
-	int timing;
+	int timing, x, y;
 	pList = pRoot->selectNodes("enemy");
 	this->stage.resize(pList.length());
 	for(size_t i = 0; i < pList.length(); i++) {
@@ -90,7 +90,9 @@ bool Play::loadStage(std::string stagePath) {
 		name = pEnemy->getAttribute("name");
 		speed = std::stof(pEnemy->getAttribute("speed"));
 		timing = std::stoi(pEnemy->getAttribute("timing"));
-		this->stage[i] = {name, speed, timing};
+		x = std::stoi(pEnemy->getAttribute("x"));
+		y = std::stoi(pEnemy->getAttribute("y"));
+		this->stage[i] = {name, x, y, speed, timing};
 	}
 
 	return true;
@@ -122,12 +124,14 @@ void Play::keyProcessing() {
 void Play::enemyProcessing() {
 	// Enemy flag processings.
 	size_t newindex;
+	std::string enemyName;
 	for(size_t i = this->enemyCounter; i < this->stage.size(); i++) {
 		if(this->counter == std::get<STG_TIMING>(this->stage[i])) {
 			if(this->falsePoolIndex.size() == 0) break;
+			enemyName = std::get<STG_NAME>(this->stage[i]);
 			newindex = this->falsePoolIndex.front();
 			this->falsePoolIndex.pop_front();
-			new(std::get<POOL_BODY>(this->enemyPool[newindex])) Enemy(*this->enemyAnimations["Sphere"]->getParts(), this->enemyAnimations["Sphere"]->getInterval(), 3);
+			new(std::get<POOL_BODY>(this->enemyPool[newindex])) Enemy(*this->enemyAnimations[enemyName]->getParts(), this->enemyAnimations[enemyName]->getInterval(), std::get<STG_X>(this->stage[i]), std::get<STG_Y>(this->stage[i]), 3);
 			std::get<POOL_FLAG>(this->enemyPool[newindex]) = true;
 			this->enemyCounter++;
 		} else if(this->counter > std::get<STG_TIMING>(this->stage[i])) {
@@ -226,7 +230,7 @@ bool Game::loadPlayers() {
 		if(err != E_NULL) rightName = buf;
 		else rightName = name;
 
-		this->player.emplace_back(new Player(this->playerImages[name], this->playerImages[leftName], this->playerImages[rightName], playerImagesInterval[name], speed));
+		this->player.emplace_back(new Player(this->playerImages[name], this->playerImages[leftName], this->playerImages[rightName], playerImagesInterval[name], this->playScreen.getRightX() / 2, this->playScreen.getBottomY() - 60, speed));
 	}
 	return true;
 }

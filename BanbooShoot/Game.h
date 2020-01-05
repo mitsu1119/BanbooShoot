@@ -30,9 +30,9 @@ public:
 
 // Stage type.
 enum StagePartTupleTag {
-	STG_NAME, STG_SPEED, STG_TIMING
+	STG_NAME, STG_X, STG_Y, STG_SPEED, STG_TIMING
 };
-typedef std::tuple<std::string, double, int> StagePart;
+typedef std::tuple<std::string, int, int, double, int> StagePart;
 typedef std::vector<StagePart> Stage;
 
 // Play class. Actual game disp.

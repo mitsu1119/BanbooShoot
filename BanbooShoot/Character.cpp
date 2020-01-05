@@ -1,13 +1,13 @@
 #include "Character.h"
 
 // ----------------------------------------------------- Character class --------------------------------------------------
-Character::Character(const Image *img, double speed): speed(speed) {
-	this->point = new Point(0, 0);
+Character::Character(const Image *img, int initX, int initY, double speed): speed(speed) {
+	this->point = new Point(initX, initY);
 	this->anim = new Animation(img);
 }
 
-Character::Character(std::vector<const Image *> &anim, size_t animInterval, double speed): speed(speed) {
-	this->point = new Point(0, 0);
+Character::Character(std::vector<const Image *> &anim, size_t animInterval, int initX, int initY, double speed): speed(speed) {
+	this->point = new Point(initX, initY);
 	this->anim = new Animation(anim, animInterval);
 }
 
@@ -30,12 +30,12 @@ void Character::draw() const {
 }
 
 // ----------------------------------------------------- Player class -----------------------------------------------------
-Player::Player(const Image *img, double speed): Character(img, speed), movingDir(CENTER) {
+Player::Player(const Image *img, int initX, int initY, double speed): Character(img, initX, initY, speed), movingDir(CENTER) {
 	this->leftAnim = new Animation(img);
 	this->rightAnim = new Animation(img);
 }
 
-Player::Player(std::vector<const Image *> &anim, std::vector<const Image *> &leftAnimation, std::vector<const Image *> &rightAnimation, size_t animInterval, double speed): Character(anim, animInterval, speed), movingDir(CENTER) {
+Player::Player(std::vector<const Image *> &anim, std::vector<const Image *> &leftAnimation, std::vector<const Image *> &rightAnimation, size_t animInterval, int initX, int initY, double speed): Character(anim, animInterval, initX, initY, speed), movingDir(CENTER) {
 	this->leftAnim = new Animation(leftAnimation, animInterval);
 	this->rightAnim = new Animation(rightAnimation, animInterval);
 }
@@ -71,8 +71,8 @@ void Player::draw() const {
 }
 
 // ----------------------------------------------------- Enemy class ------------------------------------------------------
-Enemy::Enemy(const Image *img, double speed) : Character(img, speed) {
+Enemy::Enemy(const Image *img, int initX, int initY, double speed) : Character(img, initX, initY, speed) {
 }
 
-Enemy::Enemy(std::vector<const Image *> &anim, size_t animInterval, double speed): Character(anim, animInterval, speed) {
+Enemy::Enemy(std::vector<const Image *> &anim, size_t animInterval, int initX, int initY, double speed): Character(anim, animInterval, initX, initY, speed) {
 }
