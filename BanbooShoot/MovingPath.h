@@ -31,13 +31,16 @@ private:
 
 public:
 	MovingPath();
-	MovingPath(std::string path);
+	MovingPath(int initX, int initY, std::string path);
 
 	using iterator = std::vector<MovingPathNode>::iterator;
 	using const_iterator = std::vector<MovingPathNode>::const_iterator;
 
+	size_t size() { return this->paths.size(); }
 	iterator begin() { return this->paths.begin(); }
 	iterator end() { return this->paths.end(); }
 	const_iterator begin() const { return this->paths.begin(); }
 	const_iterator end() const { return this->paths.end(); }
+
+	MovingPathNode &operator [](size_t n) { return this->paths[n]; }
 };

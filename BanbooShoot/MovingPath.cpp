@@ -24,10 +24,12 @@ const Point &MovingPathNode::getLine() const {
 MovingPath::MovingPath() {
 }
 
-MovingPath::MovingPath(std::string path) {
+MovingPath::MovingPath(int initX, int initY, std::string path) {
 	int x, y;
 	auto tokens = splitStr(path, ' ');
 	int now = MPNT_LINE;
+	bool firstFlag = true;
+	Point pad;
 	for(size_t i = 0; i < tokens.size(); ++i) {
 		if(tokens[i] == "l") {
 			now = MPNT_LINE;
@@ -37,6 +39,10 @@ MovingPath::MovingPath(std::string path) {
 		x = std::stoi(tokens[i]);
 		y = std::stoi(tokens[i+1]);
 		i++;
-		if(now == MPNT_LINE) this->paths.emplace_back(MovingPathNode(Point(x, y)));
+		if(firstFlag) {
+			pad = Point(x, y);
+			firstFlag = false;
+		}
+		if(now == MPNT_LINE) this->paths.emplace_back(MovingPathNode(Point(x, y) - pad));
 	}
 }

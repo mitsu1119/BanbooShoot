@@ -40,7 +40,7 @@ public:
 	Player(const Image *img, int initX, int initY, double speed);																/* generate from a image handle */
 	Player(std::vector<const Image *> &anim, std::vector<const Image *> &leftAnimation, std::vector<const Image *> &rightAnimation, size_t animInterval, int initX, int initY, double speed);	/* generate from animation parts */
 	~Player();
-
+	
 	void move(Direction dir);
 	void draw() const;
 };
@@ -49,9 +49,15 @@ public:
 class Enemy: public Character {
 private:
 	MovingPath mpath;
+	size_t segNum;
+	Point segS, segE;
+	const Point init;
+	double t;		// Determine this enemy coordinate parameter. 0 <= t <= 1
 public:
 	Enemy(const Image *img, int initX, int initY, double speed, MovingPath &&movingPath);															/* generate from a image handle */
 	Enemy(std::vector<const Image *> &anim, size_t animInterval, int initX, int initY, double speed, MovingPath &&movingPath);		/* generate from animation parts */
 
+	void update();
+	void move();
 	void draw() const;
 };

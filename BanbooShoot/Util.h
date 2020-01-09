@@ -29,6 +29,14 @@ public:
 	void moveY(double dy);
 	void setX(double x);
 	void setY(double y);
+
+	Point operator +(const Point &right) const {
+		return Point(this->x + right.x, this->y + right.y);
+	}
+
+	Point operator -(const Point &right) const {
+		return Point(this->x - right.x, this->y - right.y);
+	}
 };
 inline double Point::getX() const { return this->x; }
 inline double Point::getY() const { return this->y; }
