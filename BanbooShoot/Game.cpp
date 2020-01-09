@@ -134,7 +134,7 @@ void Play::enemyProcessing() {
 			enemyName = std::get<STG_NAME>(this->stage[i]);
 			newindex = this->falsePoolIndex.front();
 			this->falsePoolIndex.pop_front();
-			new(std::get<POOL_BODY>(this->enemyPool[newindex])) Enemy(*this->enemyAnimations[enemyName]->getParts(), this->enemyAnimations[enemyName]->getInterval(), std::get<STG_X>(this->stage[i]), std::get<STG_Y>(this->stage[i]), 3);
+			new(std::get<POOL_BODY>(this->enemyPool[newindex])) Enemy(*this->enemyAnimations[enemyName]->getParts(), this->enemyAnimations[enemyName]->getInterval(), std::get<STG_X>(this->stage[i]), std::get<STG_Y>(this->stage[i]), 3, std::move(std::get<STG_MOVEPATH>(this->stage[i])));
 			std::get<POOL_FLAG>(this->enemyPool[newindex]) = true;
 			this->enemyCounter++;
 		} else if(this->counter > std::get<STG_TIMING>(this->stage[i])) {

@@ -48,8 +48,10 @@ public:
 // Enemy class.
 class Enemy: public Character {
 private:
-
+	MovingPath mpath;
 public:
-	Enemy(const Image *img, int initX, int initY, double speed);															/* generate from a image handle */
-	Enemy(std::vector<const Image *> &anim, size_t animInterval, int initX, int initY, double speed);		/* generate from animation parts */
+	Enemy(const Image *img, int initX, int initY, double speed, MovingPath &&movingPath);															/* generate from a image handle */
+	Enemy(std::vector<const Image *> &anim, size_t animInterval, int initX, int initY, double speed, MovingPath &&movingPath);		/* generate from animation parts */
+
+	void draw() const;
 };

@@ -21,6 +21,8 @@ public:
 	MovingPathNode(Point &&linePoint);
 	MovingPathNode(Point &bezir1, Point &bezir2, Point &bezir3);
 	~MovingPathNode();
+
+	const Point &getLine() const;
 };
 
 class MovingPath {
@@ -30,4 +32,12 @@ private:
 public:
 	MovingPath();
 	MovingPath(std::string path);
+
+	using iterator = std::vector<MovingPathNode>::iterator;
+	using const_iterator = std::vector<MovingPathNode>::const_iterator;
+
+	iterator begin() { return this->paths.begin(); }
+	iterator end() { return this->paths.end(); }
+	const_iterator begin() const { return this->paths.begin(); }
+	const_iterator end() const { return this->paths.end(); }
 };

@@ -4,6 +4,9 @@ MovingPathNode::MovingPathNode(Point &&linePoint): type(MPNT_LINE) {
 	this->line = std::move(linePoint);
 }
 
+MovingPathNode::~MovingPathNode() {
+}
+
 MovingPathNode::MovingPathNode(Point &bezir1, Point &bezir2, Point &bezir3) : type(MPNT_BEZIER) {
 	this->bezier = new BezierNode;
 	this->bezier->node1.setX(bezir1.getX());
@@ -14,7 +17,8 @@ MovingPathNode::MovingPathNode(Point &bezir1, Point &bezir2, Point &bezir3) : ty
 	this->bezier->node3.setY(bezir3.getY());
 }
 
-MovingPathNode::~MovingPathNode() {
+const Point &MovingPathNode::getLine() const {
+	return this->line;
 }
 
 MovingPath::MovingPath() {

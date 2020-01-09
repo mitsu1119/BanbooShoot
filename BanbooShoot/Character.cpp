@@ -71,8 +71,21 @@ void Player::draw() const {
 }
 
 // ----------------------------------------------------- Enemy class ------------------------------------------------------
-Enemy::Enemy(const Image *img, int initX, int initY, double speed) : Character(img, initX, initY, speed) {
+Enemy::Enemy(const Image *img, int initX, int initY, double speed, MovingPath &&movingPath): Character(img, initX, initY, speed), mpath(movingPath){
 }
 
-Enemy::Enemy(std::vector<const Image *> &anim, size_t animInterval, int initX, int initY, double speed): Character(anim, animInterval, initX, initY, speed) {
+Enemy::Enemy(std::vector<const Image *> &anim, size_t animInterval, int initX, int initY, double speed, MovingPath &&movingPath): Character(anim, animInterval, initX, initY, speed), mpath(movingPath){
+}
+
+void Enemy::draw() const {
+	Character::draw();
+
+	Point pt, pt2;
+	DrawCircle(this->point->getX(), this->point->getY(), 3, WHITE);
+	for(auto &&node: this->mpath) {
+		pt2 = pt;
+		pt = node.getLine();
+		DrawLine(this->point->getX() + pt.getX(), this->point->getY() + pt.getY(), this->point->getX() + pt2.getX(), this->point->getY() + pt2.getY(), WHITE);
+		DrawCircle(this->point->getX() + pt.getX(), this->point->getY() + pt.getY(), 3, WHITE);
+	}
 }

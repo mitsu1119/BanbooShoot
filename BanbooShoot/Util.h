@@ -3,6 +3,9 @@
 #include <string>
 #include "DxLib.h"
 
+#define WHITE GetColor(255, 255, 255)
+#define BLACK GetColor(0, 0, 0)
+
 // Split string
 std::vector<std::string> splitStr(const std::string &str, char delim);
 
