@@ -10,6 +10,7 @@
 #include "Character.h"
 #include "MovingPath.h"
 #include "mitXML.h"
+#include "MovingPath.h"
 
 // Base class
 class Scene {
@@ -30,9 +31,9 @@ public:
 
 // Stage type.
 enum StagePartTupleTag {
-	STG_NAME, STG_X, STG_Y, STG_SPEED, STG_TIMING
+	STG_NAME, STG_X, STG_Y, STG_SPEED, STG_TIMING, STG_MOVEPATH
 };
-typedef std::tuple<std::string, int, int, double, int> StagePart;
+typedef std::tuple<std::string, int, int, double, int, MovingPath> StagePart;
 typedef std::vector<StagePart> Stage;
 
 // Play class. Actual game disp.
@@ -47,10 +48,9 @@ private:
 		POOL_FLAG, POOL_BODY
 	};
 	std::vector<std::tuple<bool, Enemy *>> enemyPool;
-	std::deque<size_t> falsePoolIndex;		// List of indexes for this->enemyPool with the flag false.
+	std::deque<size_t> falsePoolIndex;		// List of indexes for "this->enemyPool" with the flag is false.
 	Stage stage;
 	size_t enemyCounter;
-	MovingPath enemMovePattern;
 
 	// System datas.
 	void keyProcessing();

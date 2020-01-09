@@ -1,5 +1,22 @@
 #include "Util.h"
 
+// ------------------------------------------------------------------------------------------------------------------------
+std::vector<std::string> splitStr(const std::string &str, char delim) {
+	std::vector<std::string> elems;
+	std::string x;
+	for(auto ch: str) {
+		if(ch == delim) {
+			if(!x.empty()) elems.emplace_back(x);
+			x.clear();
+		} else {
+			x += ch;
+		}
+	}
+
+	if(!x.empty()) elems.emplace_back(x);
+	return elems;
+}
+
 // ----------------------------------------------------- Point class ------------------------------------------------------
 Point::Point(): x(0), y(0) {
 }

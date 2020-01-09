@@ -80,6 +80,8 @@ bool Play::loadStage(std::string stagePath) {
 		this->enemyAnimations[name] = new Animation(this->enemyImages[name], enemyImageInterval);
 	}
 
+	// Make stage data.
+	// Enemy datas need to be aligned by timing.
 	MITXMLElement *pEnemy;
 	double speed;
 	int timing, x, y;
@@ -92,7 +94,7 @@ bool Play::loadStage(std::string stagePath) {
 		timing = std::stoi(pEnemy->getAttribute("timing"));
 		x = std::stoi(pEnemy->getAttribute("x"));
 		y = std::stoi(pEnemy->getAttribute("y"));
-		this->stage[i] = {name, x, y, speed, timing};
+		this->stage[i] = {name, x, y, speed, timing, MovingPath(pEnemy->getAttribute("path"))};
 	}
 
 	return true;
@@ -126,6 +128,7 @@ void Play::enemyProcessing() {
 	size_t newindex;
 	std::string enemyName;
 	for(size_t i = this->enemyCounter; i < this->stage.size(); i++) {
+		// When the appearance time of the enemy is reached, load the data from "this->stage" and make it appear.
 		if(this->counter == std::get<STG_TIMING>(this->stage[i])) {
 			if(this->falsePoolIndex.size() == 0) break;
 			enemyName = std::get<STG_NAME>(this->stage[i]);

@@ -14,12 +14,20 @@ typedef struct _BezierNode {
 class MovingPathNode {
 private:
 	MovingPathNodeType type;
-	Point *line;
+	Point line;
 	BezierNode *bezier;
 
 public:
-	MovingPathNode(Point &linePoint);
+	MovingPathNode(Point &&linePoint);
 	MovingPathNode(Point &bezir1, Point &bezir2, Point &bezir3);
 	~MovingPathNode();
 };
-typedef std::vector<MovingPathNode> MovingPath;
+
+class MovingPath {
+private:
+	std::vector<MovingPathNode> paths;
+
+public:
+	MovingPath();
+	MovingPath(std::string path);
+};

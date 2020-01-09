@@ -1,7 +1,7 @@
 #include "MovingPath.h"
 
-MovingPathNode::MovingPathNode(Point &linePoint): type(MPNT_LINE) {
-	this->line = new Point(linePoint.getX(), linePoint.getY());
+MovingPathNode::MovingPathNode(Point &&linePoint): type(MPNT_LINE) {
+	this->line = std::move(linePoint);
 }
 
 MovingPathNode::MovingPathNode(Point &bezir1, Point &bezir2, Point &bezir3) : type(MPNT_BEZIER) {
@@ -15,6 +15,24 @@ MovingPathNode::MovingPathNode(Point &bezir1, Point &bezir2, Point &bezir3) : ty
 }
 
 MovingPathNode::~MovingPathNode() {
-	if(this->type == MPNT_LINE) delete this->line;
-	else if(this->type == MPNT_BEZIER) delete this->bezier;
+}
+
+MovingPath::MovingPath() {
+}
+
+MovingPath::MovingPath(std::string path) {
+	int x, y;
+	auto tokens = splitStr(path, ' ');
+	int now = MPNT_LINE;
+	for(size_t i = 0; i < tokens.size(); ++i) {
+		if(tokens[i] == "l") {
+			now = MPNT_LINE;
+			continue;
+		}
+
+		x = std::stoi(tokens[i]);
+		y = std::stoi(tokens[i+1]);
+		i++;
+		if(now == MPNT_LINE) this->paths.emplace_back(MovingPathNode(Point(x, y)));
+	}
 }

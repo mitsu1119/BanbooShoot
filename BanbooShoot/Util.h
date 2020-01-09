@@ -3,6 +3,9 @@
 #include <string>
 #include "DxLib.h"
 
+// Split string
+std::vector<std::string> splitStr(const std::string &str, char delim);
+
 // Direction sets.
 enum Direction {
 	RIGHT, RUP, UP, LUP, LEFT, LDOWN, DOWN, RDOWN, CENTER
