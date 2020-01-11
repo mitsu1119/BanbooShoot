@@ -8,7 +8,7 @@ enum MovingPathNodeType {
 };
 
 typedef struct _BezierNode {
-	Point node1, node2, node3;
+	Point node1, node2, node3, node4;
 } BezierNode;
 
 typedef struct _LineNode {
@@ -27,7 +27,7 @@ private:
 
 public:
 	MovingPathNode(Point &&startPoint, Point &&endPoint);
-	MovingPathNode(Point &bezir1, Point &bezir2, Point &bezir3);
+	MovingPathNode(Point &&bezir1, Point &&bezir2, Point &&bezir3, Point &&bezir4);
 	MovingPathNode(const MovingPathNode &movingpathnode) = default;
 	MovingPathNode(MovingPathNode &&movingpathnode) noexcept;
 	~MovingPathNode();

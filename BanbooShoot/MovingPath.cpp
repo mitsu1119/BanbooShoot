@@ -11,14 +11,12 @@ MovingPathNode::~MovingPathNode() {
 	else delete this->node.bezier;
 }
 
-MovingPathNode::MovingPathNode(Point &bezir1, Point &bezir2, Point &bezir3) : type(MPNT_BEZIER) {
+MovingPathNode::MovingPathNode(Point &&bezir1, Point &&bezir2, Point &&bezir3, Point &&bezir4) : type(MPNT_BEZIER) {
 	this->node.bezier = new BezierNode;
-	this->node.bezier->node1.setX(bezir1.getX());
-	this->node.bezier->node1.setY(bezir1.getY());
-	this->node.bezier->node2.setX(bezir2.getX());
-	this->node.bezier->node2.setY(bezir2.getY());
-	this->node.bezier->node3.setX(bezir3.getX());
-	this->node.bezier->node3.setY(bezir3.getY());
+	this->node.bezier->node1 = std::move(bezir1);
+	this->node.bezier->node2 = std::move(bezir2);
+	this->node.bezier->node3 = std::move(bezir3);
+	this->node.bezier->node4 = std::move(bezir4);
 }
 
 MovingPathNode::MovingPathNode(MovingPathNode &&movingpathnode) noexcept {
@@ -44,26 +42,40 @@ MovingPath::MovingPath(std::string path) {
 	auto tokens = splitStr(path, {' ', ','});
 	bool firstFlag = true;
 	Point *pad = nullptr;
-
+	int now = MPNT_LINE;
 	size_t cnt = 0;
+	Point start;
 	while(cnt < tokens.size()) {
-		if(tokens[cnt] == "m") {
+		if(tokens[cnt] == "M" || tokens[cnt] == "m") {
+			now = MPNT_LINE;
 			x = std::stof(tokens[cnt + 1]);
 			y = std::stof(tokens[cnt + 2]);
-			cnt += 3;
 			if(pad == nullptr) pad = new Point(x, y);
-
-			Point end(x, y);
-			while(cnt < tokens.size() && std::isdigit(tokens[cnt][0])) {
-				Point start = end;
+			start = Point(x, y);
+			cnt += 2;
+		} else if(tokens[cnt] == "C" || tokens[cnt] == "c") {
+			now = MPNT_BEZIER;
+		} else if(tokens[cnt] == "L" || tokens[cnt] == "l") {
+			now = MPNT_LINE;
+		} else {
+			if(now == MPNT_LINE) {
 				x = std::stof(tokens[cnt]);
 				y = std::stof(tokens[cnt + 1]);
-				end = Point(x, y);
-
+				Point end(x, y);
 				this->paths.emplace_back(start - *pad, end - *pad);
-				cnt += 2;
+				start = end;
+				cnt++;
+			} else {
+				x = std::stof(tokens[cnt + 4]);
+				y = std::stof(tokens[cnt + 5]);
+				Point end(x, y);
+				this->paths.emplace_back(start - *pad, Point(std::stof(tokens[cnt]), std::stof(tokens[cnt + 1])) - *pad, Point(std::stof(tokens[cnt + 2]), std::stof(tokens[cnt + 3])) - *pad, end - *pad);
+				start = end;
+				cnt += 5;
 			}
 		}
+		cnt++;
 	}
+
 	if(pad != nullptr) delete pad;
 }

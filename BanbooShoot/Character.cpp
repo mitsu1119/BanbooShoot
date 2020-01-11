@@ -104,8 +104,10 @@ void Enemy::move() {
 
 void Enemy::draw() const {
 	const LineNode *li;
+	const BezierNode *bz;
 	const MPNode *dnode;
 	bool isFirst = true;
+	Character::draw();
 	for(auto &&node: this->mpath) {
 		dnode = &node.getNode();
 		if(node.getType() == MPNT_LINE) {
@@ -114,7 +116,12 @@ void Enemy::draw() const {
 			DrawCircle(this->init.getX() + li->enode.getX(), this->init.getY() +li->enode.getY(), 3, WHITE);
 			DrawLine(this->init.getX() + li->snode.getX(), this->init.getY() + li->snode.getY(), this->init.getX() + li->enode.getX(), this->init.getY() + li->enode.getY(), WHITE);
 			isFirst = false;
+		} else {
+			bz = dnode->bezier;
+			if(isFirst) DrawCircle(this->init.getX() + bz->node1.getX(), this->init.getY() +bz->node1.getY(), 3, WHITE);
+			DrawCircle(this->init.getX() + bz->node4.getX(), this->init.getY() +bz->node4.getY(), 3, WHITE);
+			DrawLine(this->init.getX() + bz->node1.getX(), this->init.getY() + bz->node1.getY(), this->init.getX() + bz->node4.getX(), this->init.getY() + bz->node4.getY(), WHITE);
+			isFirst = false;
 		}
 	}
-	Character::draw();
 }
