@@ -42,27 +42,28 @@ MovingPath::MovingPath() {
 MovingPath::MovingPath(std::string path) {
 	double x, y;
 	auto tokens = splitStr(path, {' ', ','});
-	int now = MPNT_LINE;
 	bool firstFlag = true;
-	Point pad;
-	for(size_t i = 0; i < tokens.size(); ++i) {
-		if(tokens[i] == "m") {
-			now = MPNT_LINE;
-			continue;
-		}
+	Point *pad = nullptr;
 
-		x = std::stof(tokens[i]);
-		y = std::stof(tokens[i+1]);
-		Point start(x, y);
-		if(firstFlag) {
-			pad = Point(x, y);
-			firstFlag = false;
-		}
+	size_t cnt = 0;
+	while(cnt < tokens.size()) {
+		if(tokens[cnt] == "m") {
+			x = std::stof(tokens[cnt + 1]);
+			y = std::stof(tokens[cnt + 2]);
+			cnt += 3;
+			if(pad == nullptr) pad = new Point(x, y);
 
-		x = std::stof(tokens[i+2]);
-		y = std::stof(tokens[i+3]);
-		i += 3;
-		Point end(x, y);
-		if(now == MPNT_LINE) this->paths.emplace_back(start - pad, end - pad);
+			Point end(x, y);
+			while(cnt < tokens.size() && std::isdigit(tokens[cnt][0])) {
+				Point start = end;
+				x = std::stof(tokens[cnt]);
+				y = std::stof(tokens[cnt + 1]);
+				end = Point(x, y);
+
+				this->paths.emplace_back(start - *pad, end - *pad);
+				cnt += 2;
+			}
+		}
 	}
+	if(pad != nullptr) delete pad;
 }

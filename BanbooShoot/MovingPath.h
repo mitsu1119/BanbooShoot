@@ -15,7 +15,7 @@ typedef struct _LineNode {
 	Point snode, enode;
 } LineNode;
 
-typedef struct _MPNode {
+typedef union _MPNode {
 	LineNode *line;
 	BezierNode *bezier;
 } MPNode;
