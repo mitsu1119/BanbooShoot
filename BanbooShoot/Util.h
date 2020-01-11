@@ -7,7 +7,7 @@
 #define BLACK GetColor(0, 0, 0)
 
 // Split string
-std::vector<std::string> splitStr(const std::string &str, char delim);
+std::vector<std::string> splitStr(const std::string &str, std::vector<char> &&delim);
 
 // Direction sets.
 enum Direction {

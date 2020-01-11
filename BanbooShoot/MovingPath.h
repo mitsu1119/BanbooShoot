@@ -11,18 +11,29 @@ typedef struct _BezierNode {
 	Point node1, node2, node3;
 } BezierNode;
 
+typedef struct _LineNode {
+	Point snode, enode;
+} LineNode;
+
+typedef struct _MPNode {
+	LineNode *line;
+	BezierNode *bezier;
+} MPNode;
+
 class MovingPathNode {
 private:
 	MovingPathNodeType type;
-	Point line;
-	BezierNode *bezier;
+	MPNode node;
 
 public:
-	MovingPathNode(Point &&linePoint);
+	MovingPathNode(Point &&startPoint, Point &&endPoint);
 	MovingPathNode(Point &bezir1, Point &bezir2, Point &bezir3);
+	MovingPathNode(const MovingPathNode &movingpathnode) = default;
+	MovingPathNode(MovingPathNode &&movingpathnode) noexcept;
 	~MovingPathNode();
 
-	const Point &getLine() const;
+	const MPNode &getNode() const;
+	MovingPathNodeType getType() const;
 };
 
 class MovingPath {
@@ -31,7 +42,7 @@ private:
 
 public:
 	MovingPath();
-	MovingPath(int initX, int initY, std::string path);
+	MovingPath(std::string path);
 
 	using iterator = std::vector<MovingPathNode>::iterator;
 	using const_iterator = std::vector<MovingPathNode>::const_iterator;

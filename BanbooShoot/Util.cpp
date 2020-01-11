@@ -1,11 +1,11 @@
 #include "Util.h"
 
 // ------------------------------------------------------------------------------------------------------------------------
-std::vector<std::string> splitStr(const std::string &str, char delim) {
+std::vector<std::string> splitStr(const std::string &str, std::vector<char> &&delim) {
 	std::vector<std::string> elems;
 	std::string x;
 	for(auto ch: str) {
-		if(ch == delim) {
+		if(std::find(delim.begin(), delim.end(), ch) != delim.end()) {
 			if(!x.empty()) elems.emplace_back(x);
 			x.clear();
 		} else {

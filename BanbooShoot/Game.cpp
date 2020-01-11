@@ -94,7 +94,7 @@ bool Play::loadStage(std::string stagePath) {
 		timing = std::stoi(pEnemy->getAttribute("timing"));
 		x = std::stoi(pEnemy->getAttribute("x"));
 		y = std::stoi(pEnemy->getAttribute("y"));
-		this->stage[i] = {name, x, y, speed, timing, MovingPath(x, y, pEnemy->getAttribute("path"))};
+		this->stage[i] = {name, x, y, speed, timing, MovingPath(pEnemy->getAttribute("path"))};
 	}
 
 	return true;

@@ -71,14 +71,10 @@ void Player::draw() const {
 }
 
 // ----------------------------------------------------- Enemy class ------------------------------------------------------
-Enemy::Enemy(const Image *img, int initX, int initY, double speed, MovingPath &&movingPath): Character(img, initX, initY, speed), mpath(movingPath), t(0), segNum(0), segS(initX, initY), init(initX, initY) {
-	if(this->mpath.size() >= 2) this->segE = this->mpath[1].getLine() + this->init;
-	else this->segE = this->segS;
+Enemy::Enemy(const Image *img, int initX, int initY, double speed, MovingPath &&movingPath): Character(img, initX, initY, speed), mpath(movingPath), t(0), segNum(0), init(initX, initY) {
 }
 
-Enemy::Enemy(std::vector<const Image *> &anim, size_t animInterval, int initX, int initY, double speed, MovingPath &&movingPath): Character(anim, animInterval, initX, initY, speed), mpath(movingPath), t(0), segNum(0), segS(initX, initY), init(initX, initY) {
-	if(this->mpath.size() >= 2) this->segE = this->mpath[1].getLine() + this->init;
-	else this->segE = this->segS;
+Enemy::Enemy(std::vector<const Image *> &anim, size_t animInterval, int initX, int initY, double speed, MovingPath &&movingPath): Character(anim, animInterval, initX, initY, speed), mpath(movingPath), t(0), segNum(0), init(initX, initY) {
 }
 
 void Enemy::update() {
@@ -87,6 +83,7 @@ void Enemy::update() {
 }
 
 void Enemy::move() {
+	/*
 	if(this->t >= 1) {
 		segNum++;
 		this->t = 0;
@@ -102,17 +99,22 @@ void Enemy::move() {
 	this->point->setY(this->segS.getY() + (segE.getY() - segS.getY()) *t);
 
 	this->t += 1.0 / 60.0;
+	*/
 }
 
 void Enemy::draw() const {
-	const Point *pt, *pt2 = nullptr;
+	const LineNode *li;
+	const MPNode *dnode;
 	bool isFirst = true;
 	for(auto &&node: this->mpath) {
-		pt = &node.getLine();
-		DrawCircle(this->init.getX() + pt->getX(), this->init.getY() + pt->getY(), 3, WHITE);
-		if(!isFirst) DrawLine(this->init.getX() + pt->getX(), this->init.getY() +  pt->getY(), this->init.getX() + pt2->getX(), this->init.getY() + pt2->getY(), WHITE);
-		pt2 = pt;
-		isFirst = false;
+		dnode = &node.getNode();
+		if(node.getType() == MPNT_LINE) {
+			li = dnode->line;
+			if(isFirst) DrawCircle(this->init.getX() + li->snode.getX(), this->init.getY() +li->snode.getY(), 3, WHITE);
+			DrawCircle(this->init.getX() + li->enode.getX(), this->init.getY() +li->enode.getY(), 3, WHITE);
+			DrawLine(this->init.getX() + li->snode.getX(), this->init.getY() + li->snode.getY(), this->init.getX() + li->enode.getX(), this->init.getY() + li->enode.getY(), WHITE);
+			isFirst = false;
+		}
 	}
 	Character::draw();
 }

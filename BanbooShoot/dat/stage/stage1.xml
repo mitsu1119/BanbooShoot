@@ -21,6 +21,6 @@
 	</enemyimage>
 	
 	<!-- 敵の出現パターン -->
-	<enemy name="Sphere" x="10" y="20" speed="4" timing="60" path="l 10 100, 90 100, 90 200, 40 220, 60 260"/>
-	<enemy name="Sphere" x="200" y="20" speed="4" timing="80" path="l 10 30, 50 80, 90 60, 70 100"/>
+	<enemy name="Sphere" x="10" y="20" speed="4" timing="60" path="m -4,60 50,80 50,80  40,100"/>
+	<enemy name="Sphere" x="200" y="20" speed="4" timing="80" path="m -4,60 50,80"/>
 </stage>

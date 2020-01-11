@@ -50,7 +50,6 @@ class Enemy: public Character {
 private:
 	MovingPath mpath;
 	size_t segNum;
-	Point segS, segE;
 	const Point init;
 	double t;		// Determine this enemy coordinate parameter. 0 <= t <= 1
 public:
