@@ -1,9 +1,16 @@
 #include "MovingPath.h"
 
+Point calcBezierPoint(double t, const BezierNode &bz) {
+	double x = (1 - t) * (1 - t) * (1 - t) * bz.node1.getX() + 3 * (1 - t) * (1 - t) * t * bz.node2.getX() + 3 * (1 - t) * t * t * bz.node3.getX() + t * t * t * bz.node4.getX();
+	double y = (1 - t) * (1 - t) * (1 - t) * bz.node1.getY() + 3 * (1 - t) * (1 - t) * t * bz.node2.getY() + 3 * (1 - t) * t * t * bz.node3.getY() + t * t * t * bz.node4.getY();
+	return Point(x, y);
+}
+
 MovingPathNode::MovingPathNode(Point &&startPoint, Point &&endPoint): type(MPNT_LINE) {
 	this->node.line = new LineNode;
 	this->node.line->snode = std::move(startPoint);
 	this->node.line->enode = std::move(endPoint);
+	this->node.line->length = std::sqrt(std::pow(this->node.line->enode.getX() - this->node.line->snode.getX(), 2) + std::pow(this->node.line->enode.getY() - this->node.line->snode.getY(), 2));
 }
 
 MovingPathNode::~MovingPathNode() {
@@ -17,6 +24,22 @@ MovingPathNode::MovingPathNode(Point &&bezir1, Point &&bezir2, Point &&bezir3, P
 	this->node.bezier->node2 = std::move(bezir2);
 	this->node.bezier->node3 = std::move(bezir3);
 	this->node.bezier->node4 = std::move(bezir4);
+
+	// Calc bezier length.
+	size_t accurate = 10;
+	double length = 0.0, t;
+	Point prev;
+	for(size_t i = 0; i <= accurate; i++) {
+		t = (double)i / (double)accurate;
+		Point pt = calcBezierPoint(t, *this->node.bezier);
+		if(i > 0) {
+			double dx = pt.getX() - prev.getX();
+			double dy = pt.getY() - prev.getY();
+			length += std::sqrt(dx * dx + dy * dy);
+		}
+		prev = pt;
+	}
+	this->node.bezier->length = length;
 }
 
 MovingPathNode::MovingPathNode(MovingPathNode &&movingpathnode) noexcept {

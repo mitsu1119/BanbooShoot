@@ -52,6 +52,7 @@ private:
 	size_t segNum;
 	const Point init;
 	double t;		// Determine this enemy coordinate parameter. 0 <= t <= 1
+	size_t T;
 public:
 	Enemy(const Image *img, int initX, int initY, double speed, MovingPath &&movingPath);															/* generate from a image handle */
 	Enemy(std::vector<const Image *> &anim, size_t animInterval, int initX, int initY, double speed, MovingPath &&movingPath);		/* generate from animation parts */

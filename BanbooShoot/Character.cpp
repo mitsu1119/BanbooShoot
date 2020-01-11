@@ -71,10 +71,10 @@ void Player::draw() const {
 }
 
 // ----------------------------------------------------- Enemy class ------------------------------------------------------
-Enemy::Enemy(const Image *img, int initX, int initY, double speed, MovingPath &&movingPath): Character(img, initX, initY, speed), mpath(movingPath), t(0), segNum(0), init(initX, initY) {
+Enemy::Enemy(const Image *img, int initX, int initY, double speed, MovingPath &&movingPath): Character(img, initX, initY, speed), mpath(movingPath), t(0), T(0), segNum(0), init(initX, initY) {
 }
 
-Enemy::Enemy(std::vector<const Image *> &anim, size_t animInterval, int initX, int initY, double speed, MovingPath &&movingPath): Character(anim, animInterval, initX, initY, speed), mpath(movingPath), t(0), segNum(0), init(initX, initY) {
+Enemy::Enemy(std::vector<const Image *> &anim, size_t animInterval, int initX, int initY, double speed, MovingPath &&movingPath): Character(anim, animInterval, initX, initY, speed), mpath(movingPath), t(0), T(0), segNum(0), init(initX, initY) {
 }
 
 void Enemy::update() {
@@ -83,25 +83,27 @@ void Enemy::update() {
 }
 
 void Enemy::move() {
+	if(this->mpath[segNum].getType() == MPNT_LINE) {
+		this->point->setX(this->init.getX() + this->mpath[segNum].getNode().line->snode.getX() + (this->mpath[segNum].getNode().line->enode.getX() - this->mpath[segNum].getNode().line->snode.getX()) * this->t);
+		this->point->setY(this->init.getY() + this->mpath[segNum].getNode().line->snode.getY() + (this->mpath[segNum].getNode().line->enode.getY() - this->mpath[segNum].getNode().line->snode.getY()) * this->t);
+		this->T++;
+		this->t = (this->speed * (double)T) / this->mpath[segNum].getNode().line->length;
+	} else {
+		Point pt = calcBezierPoint(t, *this->mpath[segNum].getNode().bezier);
+		this->point->setX(this->init.getX() + pt.getX());
+		this->point->setY(this->init.getY() + pt.getY());
+		this->T++;
+		this->t = (this->speed * (double)T) / this->mpath[segNum].getNode().bezier->length;
+	}
+
 	if(this->t >= 1) {
 		if(this->segNum < this->mpath.size() - 1) {
 			this->segNum++;
 			this->t = 0;
+			this->T = 0;
 		} else {
 			this->t = 1;
 		}
-	}
-
-	if(this->mpath[segNum].getType() == MPNT_LINE) {
-		this->point->setX(this->init.getX() + this->mpath[segNum].getNode().line->snode.getX() + (this->mpath[segNum].getNode().line->enode.getX() - this->mpath[segNum].getNode().line->snode.getX()) * this->t);
-		this->point->setY(this->init.getY() + this->mpath[segNum].getNode().line->snode.getY() + (this->mpath[segNum].getNode().line->enode.getY() - this->mpath[segNum].getNode().line->snode.getY()) * this->t);
-		this->t += 1.0 / 60.0;
-	} else {
-		double x = (1 - t) * (1 - t) * (1 - t) * this->mpath[segNum].getNode().bezier->node1.getX() + 3 * (1 - t) * (1 - t) * t * this->mpath[segNum].getNode().bezier->node2.getX() + 3 * (1 - t) * t * t * this->mpath[segNum].getNode().bezier->node3.getX() + t * t * t * this->mpath[segNum].getNode().bezier->node4.getX();
-		double y = (1 - t) * (1 - t) * (1 - t) * this->mpath[segNum].getNode().bezier->node1.getY() + 3 * (1 - t) * (1 - t) * t * this->mpath[segNum].getNode().bezier->node2.getY() + 3 * (1 - t) * t * t * this->mpath[segNum].getNode().bezier->node3.getY() + t * t * t * this->mpath[segNum].getNode().bezier->node4.getY();
-		this->point->setX(this->init.getX() + x);
-		this->point->setY(this->init.getY() + y);
-		this->t += 1.0 / 60.0;
 	}
 }
 

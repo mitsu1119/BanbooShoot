@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <cmath>
 #include "Util.h"
 
 // Moving path information.
@@ -9,10 +10,14 @@ enum MovingPathNodeType {
 
 typedef struct _BezierNode {
 	Point node1, node2, node3, node4;
+	double length;
 } BezierNode;
+
+Point calcBezierPoint(double t, const BezierNode &bz);
 
 typedef struct _LineNode {
 	Point snode, enode;
+	double length;
 } LineNode;
 
 typedef union _MPNode {
