@@ -83,30 +83,35 @@ void Enemy::update() {
 }
 
 void Enemy::move() {
-	/*
 	if(this->t >= 1) {
-		segNum++;
-		this->t = 0;
-		if(mpath.size() >= this->segNum + 2) {
-			this->segS = this->segE;			// this->segE == this->mpath[segNum].getLine() + this->init
-			this->segE = this->mpath[segNum + 1].getLine() + this->init;
+		if(this->segNum < this->mpath.size() - 1) {
+			this->segNum++;
+			this->t = 0;
 		} else {
-			this->segS = this->segE;
+			this->t = 1;
 		}
 	}
 
-	this->point->setX(this->segS.getX() + (segE.getX() - segS.getX()) * t);
-	this->point->setY(this->segS.getY() + (segE.getY() - segS.getY()) *t);
-
-	this->t += 1.0 / 60.0;
-	*/
+	if(this->mpath[segNum].getType() == MPNT_LINE) {
+		this->point->setX(this->init.getX() + this->mpath[segNum].getNode().line->snode.getX() + (this->mpath[segNum].getNode().line->enode.getX() - this->mpath[segNum].getNode().line->snode.getX()) * this->t);
+		this->point->setY(this->init.getY() + this->mpath[segNum].getNode().line->snode.getY() + (this->mpath[segNum].getNode().line->enode.getY() - this->mpath[segNum].getNode().line->snode.getY()) * this->t);
+		this->t += 1.0 / 60.0;
+	} else {
+		double x = (1 - t) * (1 - t) * (1 - t) * this->mpath[segNum].getNode().bezier->node1.getX() + 3 * (1 - t) * (1 - t) * t * this->mpath[segNum].getNode().bezier->node2.getX() + 3 * (1 - t) * t * t * this->mpath[segNum].getNode().bezier->node3.getX() + t * t * t * this->mpath[segNum].getNode().bezier->node4.getX();
+		double y = (1 - t) * (1 - t) * (1 - t) * this->mpath[segNum].getNode().bezier->node1.getY() + 3 * (1 - t) * (1 - t) * t * this->mpath[segNum].getNode().bezier->node2.getY() + 3 * (1 - t) * t * t * this->mpath[segNum].getNode().bezier->node3.getY() + t * t * t * this->mpath[segNum].getNode().bezier->node4.getY();
+		this->point->setX(this->init.getX() + x);
+		this->point->setY(this->init.getY() + y);
+		this->t += 1.0 / 60.0;
+	}
 }
 
 void Enemy::draw() const {
 	const LineNode *li;
 	const BezierNode *bz;
 	const MPNode *dnode;
+	double x, y;
 	bool isFirst = true;
+
 	Character::draw();
 	for(auto &&node: this->mpath) {
 		dnode = &node.getNode();
@@ -120,7 +125,13 @@ void Enemy::draw() const {
 			bz = dnode->bezier;
 			if(isFirst) DrawCircle(this->init.getX() + bz->node1.getX(), this->init.getY() +bz->node1.getY(), 3, WHITE);
 			DrawCircle(this->init.getX() + bz->node4.getX(), this->init.getY() +bz->node4.getY(), 3, WHITE);
-			DrawLine(this->init.getX() + bz->node1.getX(), this->init.getY() + bz->node1.getY(), this->init.getX() + bz->node4.getX(), this->init.getY() + bz->node4.getY(), WHITE);
+
+			// Draw bezier
+			for(double t = 0; t <= 1; t += 0.01) {
+				x = (1 - t) * (1 - t) * (1 - t) * bz->node1.getX() + 3 * (1 - t) * (1 - t) * t * bz->node2.getX() + 3 * (1 - t) * t * t * bz->node3.getX() + t * t * t * bz->node4.getX();
+				y = (1 - t) * (1 - t) * (1 - t) * bz->node1.getY() + 3 * (1 - t) * (1 - t) * t * bz->node2.getY() + 3 * (1 - t) * t * t * bz->node3.getY() + t * t * t * bz->node4.getY();
+				DrawPixel(this->init.getX() + x, this->init.getY() + y, WHITE);
+			}
 			isFirst = false;
 		}
 	}
