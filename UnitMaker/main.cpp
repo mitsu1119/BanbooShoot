@@ -11,7 +11,14 @@ TCHAR szChildDoc[] = _T("document");
 // Menu
 HMENU hMenuFirst, hMenuFirstWnd;
 
+// gdiplus
+Gdiplus::GdiplusStartupInput gpSI;
+ULONG_PTR lpToken;
+
 int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) {
+	
+	Gdiplus::GdiplusStartup(&lpToken, &gpSI, NULL);
+	
 	hInst = hInstance;
 
 	if(!MyRegisterWC(FrameWndProc, szFrameClassName, (HBRUSH)(COLOR_APPWORKSPACE+1))) return 1;
@@ -35,5 +42,8 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	}
 
 	DestroyMenu(hMenuFirst);
+
+	Gdiplus::GdiplusShutdown(lpToken);
+
 	return (int)msg.wParam;
 }

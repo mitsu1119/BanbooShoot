@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <tchar.h>
 #include <string>
+#include <gdiplus.h>
 
 #define IDM_FIRSTCHILD 0x100
 #define MYMENU MAKEINTRESOURCE(IDR_MENU1)
@@ -16,25 +17,53 @@ extern HMENU hMenuFirst, hMenuFirstWnd;
 extern HMENU hMenuFirst, hMenuFirstWnd;
 
 // Open selected file and store to GetWindowLongPtr(hWnd, GWLP_USERDATA).
-void OpenFileDialog(HWND hWnd) {
+// If @szFileName is not nullptr, @szFileName receives a copy of szFileName.
+Gdiplus::Image *OpenFileDialog(HWND hWnd, TCHAR *szFileName = nullptr, DWORD copySize = 0) {
 	OPENFILENAME ofn = {0};
 	TCHAR szFilePath[MAX_PATH] = {};
-	TCHAR *szFileName = (TCHAR *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
 	ofn.lStructSize = sizeof(OPENFILENAME);
 	ofn.hwndOwner = hWnd;
 	ofn.lpstrFilter = TEXT("Image files {*.png}\0*.png\0");
 	ofn.lpstrFile = szFilePath;
 	ofn.nMaxFile = MAX_PATH;
-	ofn.lpstrFileTitle = szFileName;
-	ofn.nMaxFileTitle = MAX_PATH;
+	if(szFileName != nullptr) {
+		ofn.lpstrFileTitle = szFileName;
+		ofn.nMaxFileTitle = copySize;
+	}
 	ofn.Flags = OFN_FILEMUSTEXIST;
 	GetOpenFileName(&ofn);
+
+	return new Gdiplus::Image(szFilePath);
+}
+
+// Set window (@hWnd) size based on client window size.
+BOOL SetClientSize(HWND hWnd, size_t width, size_t height) {
+	RECT rw, rc;
+	GetWindowRect(hWnd, &rw);
+	GetClientRect(hWnd, &rc);
+
+	size_t nw = (rw.right - rw.left) - (rc.right - rc.left) + width;
+	size_t nh = (rw.bottom - rw.top) - (rc.bottom - rc.top) + height;
+
+	return SetWindowPos(hWnd, NULL, 0, 0, nw, nh, SWP_NOMOVE | SWP_NOZORDER);
 }
 
 BOOL CALLBACK CloseAllProc(HWND hWnd, LPARAM lp) {
 	SendMessage(GetParent(hWnd), WM_MDIDESTROY, (WPARAM)hWnd, 0);
 	return TRUE;
+}
+
+void onPaint(HWND hWnd) {
+	PAINTSTRUCT ps;
+	HDC hdc = BeginPaint(hWnd, &ps);
+	Gdiplus::Graphics g(hdc);
+
+	Gdiplus::Image *img = (Gdiplus::Image *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+
+	g.DrawImage(img, 0, 0, img->GetWidth(), img->GetHeight());
+
+	EndPaint(hWnd, &ps);
 }
 
 // Main frame.
@@ -94,22 +123,20 @@ LRESULT CALLBACK FrameWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 
 // Child document window.
 LRESULT CALLBACK DocProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
-	TCHAR *szFileName;
-
-	HDC hdc;
-	PAINTSTRUCT ps;
+	Gdiplus::Image *img;
 
 	switch(msg) {
 	case WM_CREATE:
-		szFileName = new TCHAR[MAX_PATH];
-		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)szFileName);
-		OpenFileDialog(hWnd);
+	{
+		TCHAR szFileName[MAX_PATH];
+		img = OpenFileDialog(hWnd, szFileName, MAX_PATH);
+		SetWindowText(hWnd, szFileName);
+		SetClientSize(hWnd, img->GetWidth(), img->GetHeight());
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)img);
 		break;
-	case WM_PAINT:
-		hdc = BeginPaint(hWnd, &ps);
-		szFileName = (TCHAR *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
-		TextOut(hdc, 5, 5, szFileName, _tcslen(szFileName));
-		EndPaint(hWnd, &ps);
+	}
+	case WM_PAINT: 
+		onPaint(hWnd);
 		return 0;
 	case WM_SIZE:
 		break;
