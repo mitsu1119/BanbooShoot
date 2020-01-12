@@ -15,6 +15,28 @@ extern HINSTANCE hInst;
 extern HMENU hMenuFirst, hMenuFirstWnd;
 extern HMENU hMenuFirst, hMenuFirstWnd;
 
+// Open selected file and store to GetWindowLongPtr(hWnd, GWLP_USERDATA).
+void OpenFileDialog(HWND hWnd) {
+	OPENFILENAME ofn = {0};
+	TCHAR szFilePath[MAX_PATH] = {};
+	TCHAR *szFileName = (TCHAR *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+
+	ofn.lStructSize = sizeof(OPENFILENAME);
+	ofn.hwndOwner = hWnd;
+	ofn.lpstrFilter = TEXT("Image files {*.png}\0*.png\0");
+	ofn.lpstrFile = szFilePath;
+	ofn.nMaxFile = MAX_PATH;
+	ofn.lpstrFileTitle = szFileName;
+	ofn.nMaxFileTitle = MAX_PATH;
+	ofn.Flags = OFN_FILEMUSTEXIST;
+	GetOpenFileName(&ofn);
+}
+
+BOOL CALLBACK CloseAllProc(HWND hWnd, LPARAM lp) {
+	SendMessage(GetParent(hWnd), WM_MDIDESTROY, (WPARAM)hWnd, 0);
+	return TRUE;
+}
+
 // Main frame.
 LRESULT CALLBACK FrameWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 	static HWND hClient;
@@ -30,7 +52,7 @@ LRESULT CALLBACK FrameWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 		return 0;
 	case WM_COMMAND:
 		switch(LOWORD(wp)) {
-		case IDM_FILE_NEW:
+		case IDM_NEW:
 			mdic.szClass = szChildDoc;
 			mdic.szTitle = _T("Document");
 			mdic.hOwner = hInst;
@@ -42,13 +64,25 @@ LRESULT CALLBACK FrameWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 			mdic.lParam = 0;
 			hChild = (HWND)SendMessage(hClient, WM_MDICREATE, 0, (LPARAM)&mdic);
 			return 0;
+		case IDM_CLOSE:
+			hChild = (HWND)SendMessage(hClient, WM_MDIGETACTIVE, 0, 0);
+			if(hChild) SendMessage(hClient, WM_MDIDESTROY, (WPARAM)hChild, 0);
+			return 0;
+		case IDM_EXIT:
+			SendMessage(hWnd, WM_CLOSE, 0, 0);
+			return 0;
+		case IDM_CLOSEALL:
+			EnumChildWindows(hClient, &CloseAllProc, 0);
+			return 0;
 		default:
 			hChild = (HWND)SendMessage(hClient, WM_MDIGETACTIVE, 0, 0);
 			if(IsWindow(hChild)) SendMessage(hChild, WM_COMMAND, wp, lp);
 			break;
 		}
+		break;
 	case WM_QUERYENDSESSION:
 	case WM_CLOSE:
+		SendMessage(hWnd, WM_COMMAND, IDM_CLOSEALL, 0);
 		if(GetWindow(hClient, GW_CHILD)) return 0;
 		break;
 	case WM_DESTROY:
@@ -60,21 +94,24 @@ LRESULT CALLBACK FrameWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 
 // Child document window.
 LRESULT CALLBACK DocProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
-	static HWND hClient, hFrame;
-	HWND hEdit;
-	RECT rc;
+	TCHAR *szFileName;
+
+	HDC hdc;
+	PAINTSTRUCT ps;
 
 	switch(msg) {
 	case WM_CREATE:
-		hClient = GetParent(hWnd);
-		hFrame = GetParent(hClient);
-		GetClientRect(hWnd, &rc);
-		hEdit = CreateWindow(EDIT, NULL, WS_VISIBLE | WS_CHILD | ES_WANTRETURN | ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_AUTOHSCROLL | WS_HSCROLL, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, hWnd, NULL, hInst, NULL);
+		szFileName = new TCHAR[MAX_PATH];
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)szFileName);
+		OpenFileDialog(hWnd);
+		break;
+	case WM_PAINT:
+		hdc = BeginPaint(hWnd, &ps);
+		szFileName = (TCHAR *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+		TextOut(hdc, 5, 5, szFileName, _tcslen(szFileName));
+		EndPaint(hWnd, &ps);
 		return 0;
 	case WM_SIZE:
-		GetClientRect(hWnd, &rc);
-		hEdit = GetWindow(hWnd, GW_CHILD);
-		MoveWindow(hEdit, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, TRUE);
 		break;
 	}
 	return DefMDIChildProc(hWnd, msg, wp, lp);
