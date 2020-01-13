@@ -4,8 +4,9 @@
 //
 #define IDR_MENU1                       101
 #define IDM_NEW                         40001
+#define IDM_CLOSEALL				  40002
 #define IDM_CLOSE                       40007
-#define IDM_CLOSEALL                    40008
+#define IDM_CLOSEALLDOC                    40008
 #define IDM_EXIT                        40009
 
 // Next default values for new objects

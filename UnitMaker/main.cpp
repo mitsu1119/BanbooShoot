@@ -2,11 +2,18 @@
 
 HINSTANCE hInst;
 
+/*
+ * Frame -- Client -- Child -- SPList
+ */
+
 // Frame window class.
 TCHAR szFrameClassName[] = _T("framewindow");
 
 // Child window class.
-TCHAR szChildDoc[] = _T("document");
+TCHAR szChildDoc[] = _T("Document");
+
+// Palette windows class.
+TCHAR szSPList[] = _T("SPList");
 
 // Menu
 HMENU hMenuFirst, hMenuFirstWnd;
@@ -18,11 +25,11 @@ ULONG_PTR lpToken;
 int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) {
 	
 	Gdiplus::GdiplusStartup(&lpToken, &gpSI, NULL);
-	
 	hInst = hInstance;
 
 	if(!MyRegisterWC(FrameWndProc, szFrameClassName, (HBRUSH)(COLOR_APPWORKSPACE+1))) return 1;
 	if(!MyRegisterWC(DocProc, szChildDoc, (HBRUSH)GetStockObject(WHITE_BRUSH))) return 1;
+	if(!MyRegisterWC(SPListProc, szSPList, (HBRUSH)(COLOR_APPWORKSPACE+1))) return 1;
 
 	// Setting menu bar in frame window.
 	hMenuFirst = LoadMenu(hInst, MYMENU);

@@ -4,6 +4,7 @@
 #include <tchar.h>
 #include <string>
 #include <gdiplus.h>
+#include "..//BanbooShoot/Util.h"
 
 #define IDM_FIRSTCHILD 0x100
 #define MYMENU MAKEINTRESOURCE(IDR_MENU1)
@@ -11,10 +12,19 @@
 #define EDIT _T("EDIT")
 
 extern TCHAR szFrameClassName[];
-extern TCHAR szChildDoc[];
+extern TCHAR szChildDoc[], szSPList[];
 extern HINSTANCE hInst;
 extern HMENU hMenuFirst, hMenuFirstWnd;
 extern HMENU hMenuFirst, hMenuFirstWnd;
+
+// Split list structure.
+typedef std::vector<Point> SpList;
+
+// Document data.
+struct DocData {
+	SpList *splits;
+	Gdiplus::Image *img;
+};
 
 // Open selected file and store to GetWindowLongPtr(hWnd, GWLP_USERDATA).
 // If @szFileName is not nullptr, @szFileName receives a copy of szFileName.
@@ -54,12 +64,19 @@ BOOL CALLBACK CloseAllProc(HWND hWnd, LPARAM lp) {
 	return TRUE;
 }
 
+BOOL CALLBACK CloseAllDoc(HWND hWnd, LPARAM lp) {
+	TCHAR className[MAX_PATH];
+	GetClassName(hWnd, className, MAX_PATH);
+	if(wcsncmp(className, szSPList, MAX_PATH)  != 0) SendMessage(GetParent(hWnd), WM_MDIDESTROY, (WPARAM)hWnd, 0);
+	return TRUE;
+}
+
 void onPaint(HWND hWnd) {
 	PAINTSTRUCT ps;
 	HDC hdc = BeginPaint(hWnd, &ps);
 	Gdiplus::Graphics g(hdc);
 
-	Gdiplus::Image *img = (Gdiplus::Image *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+	Gdiplus::Image *img = (Gdiplus::Image *)((DocData *)(GetWindowLongPtr(hWnd, GWLP_USERDATA)))->img;
 
 	g.DrawImage(img, 0, 0, img->GetWidth(), img->GetHeight());
 
@@ -67,8 +84,11 @@ void onPaint(HWND hWnd) {
 }
 
 // Main frame.
+LRESULT CALLBACK SPListProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
+int MyRegisterWC(WNDPROC WndProc, LPCTSTR ClassName, HBRUSH BackGround);
 LRESULT CALLBACK FrameWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 	static HWND hClient;
+	static HWND SPList;
 	HWND hChild;
 	CLIENTCREATESTRUCT ccs;
 	MDICREATESTRUCT mdic;
@@ -77,7 +97,18 @@ LRESULT CALLBACK FrameWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 	case WM_CREATE:
 		ccs.hWindowMenu = hMenuFirstWnd;
 		ccs.idFirstChild = IDM_FIRSTCHILD;
+
+		// Client
 		hClient = CreateWindow(MDICLIENT, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, 0, 0, 0, 0, hWnd, (HMENU)1, hInst, &ccs);
+
+		// SPList
+		mdic.szClass = szSPList;
+		mdic.szTitle = _T("SPList");
+		mdic.hOwner = hInst;
+		mdic.x = mdic.y = mdic.cx = mdic.cy = CW_USEDEFAULT;
+		mdic.style = 0;
+		mdic.lParam = 0;
+		SPList = (HWND)SendMessage(hClient, WM_MDICREATE, 0, (LPARAM)&mdic);
 		return 0;
 	case WM_COMMAND:
 		switch(LOWORD(wp)) {
@@ -99,6 +130,9 @@ LRESULT CALLBACK FrameWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 			return 0;
 		case IDM_EXIT:
 			SendMessage(hWnd, WM_CLOSE, 0, 0);
+			return 0;
+		case IDM_CLOSEALLDOC:
+			EnumChildWindows(hClient, &CloseAllDoc, 0);
 			return 0;
 		case IDM_CLOSEALL:
 			EnumChildWindows(hClient, &CloseAllProc, 0);
@@ -123,24 +157,35 @@ LRESULT CALLBACK FrameWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 
 // Child document window.
 LRESULT CALLBACK DocProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
-	Gdiplus::Image *img;
+	DocData *docd;
 
 	switch(msg) {
 	case WM_CREATE:
 	{
 		TCHAR szFileName[MAX_PATH];
-		img = OpenFileDialog(hWnd, szFileName, MAX_PATH);
+		docd = new DocData;
+		docd->img = OpenFileDialog(hWnd, szFileName, MAX_PATH);
+		docd->splits = nullptr;
 		SetWindowText(hWnd, szFileName);
-		SetClientSize(hWnd, img->GetWidth(), img->GetHeight());
-		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)img);
+		SetClientSize(hWnd, docd->img->GetWidth(), docd->img->GetHeight());
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)docd);
 		break;
 	}
 	case WM_PAINT: 
 		onPaint(hWnd);
 		return 0;
-	case WM_SIZE:
+	case WM_MDIDESTROY:
+		docd = (DocData *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+		if(docd->img != nullptr) delete docd->img;
+		if(docd->splits != nullptr) delete docd->splits;
+		delete docd;
 		break;
 	}
+	return DefMDIChildProc(hWnd, msg, wp, lp);
+}
+
+// Split list window. Layer palette.
+LRESULT CALLBACK SPListProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 	return DefMDIChildProc(hWnd, msg, wp, lp);
 }
 
