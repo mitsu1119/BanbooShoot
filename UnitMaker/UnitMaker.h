@@ -87,18 +87,21 @@ void onPaint(HWND hWnd) {
 LRESULT CALLBACK SPListProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
 int MyRegisterWC(WNDPROC WndProc, LPCTSTR ClassName, HBRUSH BackGround);
 LRESULT CALLBACK FrameWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
-	static HWND hClient;
-	static HWND SPList;
+	static HWND hClient, SPList;
+	static HMENU hMenu;
+	MENUITEMINFO menuInfo;
 	HWND hChild;
 	CLIENTCREATESTRUCT ccs;
 	MDICREATESTRUCT mdic;
 
 	switch(msg) {
 	case WM_CREATE:
-		ccs.hWindowMenu = hMenuFirstWnd;
-		ccs.idFirstChild = IDM_FIRSTCHILD;
+		// Menu
+		hMenu = GetMenu(hWnd);
 
 		// Client
+		ccs.hWindowMenu = hMenuFirstWnd;
+		ccs.idFirstChild = IDM_FIRSTCHILD;
 		hClient = CreateWindow(MDICLIENT, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, 0, 0, 0, 0, hWnd, (HMENU)1, hInst, &ccs);
 
 		// SPList
@@ -136,6 +139,23 @@ LRESULT CALLBACK FrameWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 			return 0;
 		case IDM_CLOSEALL:
 			EnumChildWindows(hClient, &CloseAllProc, 0);
+			return 0;
+		case IDM_SPLITLIST:
+			menuInfo.cbSize = sizeof MENUITEMINFO;
+			menuInfo.fMask = MIIM_STATE;
+			GetMenuItemInfo(hMenu, IDM_SPLITLIST, FALSE, &menuInfo);
+			if(menuInfo.fState == MFS_CHECKED) {
+				// Hide splist list window.
+				ShowWindow(SPList, SW_HIDE);
+				UpdateWindow(SPList);
+				menuInfo.fState = MFS_UNCHECKED;
+			} else {
+				// Show splist list window.
+				ShowWindow(SPList, SW_SHOW);
+				UpdateWindow(SPList);
+				menuInfo.fState = MFS_CHECKED;
+			}
+			SetMenuItemInfo(hMenu, IDM_SPLITLIST, FALSE, &menuInfo);
 			return 0;
 		default:
 			hChild = (HWND)SendMessage(hClient, WM_MDIGETACTIVE, 0, 0);
