@@ -11,6 +11,7 @@ enum MovingPathNodeType {
 typedef struct _BezierNode {
 	Point node1, node2, node3, node4;
 	double length;
+	size_t segNum;
 } BezierNode;
 
 Point calcBezierPoint(double t, const BezierNode &bz);
@@ -18,6 +19,7 @@ Point calcBezierPoint(double t, const BezierNode &bz);
 typedef struct _LineNode {
 	Point snode, enode;
 	double length;
+	size_t segNum;
 } LineNode;
 
 typedef union _MPNode {
@@ -31,8 +33,8 @@ private:
 	MPNode node;
 
 public:
-	MovingPathNode(Point &&startPoint, Point &&endPoint);
-	MovingPathNode(Point &&bezir1, Point &&bezir2, Point &&bezir3, Point &&bezir4);
+	MovingPathNode(Point &&startPoint, Point &&endPoint, size_t segNum);
+	MovingPathNode(Point &&bezir1, Point &&bezir2, Point &&bezir3, Point &&bezir4, size_t segNum);
 	MovingPathNode(const MovingPathNode &movingpathnode) = default;
 	MovingPathNode(MovingPathNode &&movingpathnode) noexcept;
 	~MovingPathNode();
@@ -44,6 +46,9 @@ public:
 class MovingPath {
 private:
 	std::vector<MovingPathNode> paths;
+
+	// Cumulative sum of length of each segments in this->node.
+	std::vector<double> cumsum;
 
 public:
 	MovingPath();

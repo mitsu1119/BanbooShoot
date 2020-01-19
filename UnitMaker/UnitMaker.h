@@ -4,6 +4,7 @@
 #include <tchar.h>
 #include <string>
 #include <gdiplus.h>
+#include <vector>
 #include "..//BanbooShoot/Util.h"
 
 #define IDM_FIRSTCHILD 0x100
@@ -18,7 +19,8 @@ extern HMENU hMenuFirst, hMenuFirstWnd;
 extern HMENU hMenuFirst, hMenuFirstWnd;
 
 // Split list structure.
-typedef std::vector<Point> SpList;
+// pair: Start point, End point.
+typedef std::vector<std::pair<Point, Point>> SpList;
 
 // Document data.
 struct DocData {
@@ -102,7 +104,7 @@ LRESULT CALLBACK FrameWndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 		// Client
 		ccs.hWindowMenu = hMenuFirstWnd;
 		ccs.idFirstChild = IDM_FIRSTCHILD;
-		hClient = CreateWindow(MDICLIENT, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, 0, 0, 0, 0, hWnd, (HMENU)1, hInst, &ccs);
+		hClient = CreateWindow(MDICLIENT, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, 0, 0, 500, 500, hWnd, (HMENU)1, hInst, &ccs);
 
 		// SPList
 		mdic.szClass = szSPList;
@@ -185,7 +187,8 @@ LRESULT CALLBACK DocProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 		TCHAR szFileName[MAX_PATH];
 		docd = new DocData;
 		docd->img = OpenFileDialog(hWnd, szFileName, MAX_PATH);
-		docd->splits = nullptr;
+		docd->splits = new SpList;
+		docd->splits->push_back(std::make_pair(Point(0, 0), Point((double)docd->img->GetWidth(), (double)docd->img->GetHeight())));
 		SetWindowText(hWnd, szFileName);
 		SetClientSize(hWnd, docd->img->GetWidth(), docd->img->GetHeight());
 		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)docd);

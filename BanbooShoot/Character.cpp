@@ -87,22 +87,22 @@ void Enemy::move() {
 		this->point->setX(this->init.getX() + this->mpath[segNum].getNode().line->snode.getX() + (this->mpath[segNum].getNode().line->enode.getX() - this->mpath[segNum].getNode().line->snode.getX()) * this->t);
 		this->point->setY(this->init.getY() + this->mpath[segNum].getNode().line->snode.getY() + (this->mpath[segNum].getNode().line->enode.getY() - this->mpath[segNum].getNode().line->snode.getY()) * this->t);
 		this->T++;
-		this->t = (this->speed * (double)T) / this->mpath[segNum].getNode().line->length;
+		this->t = this->segNum + (this->speed * (double)T) / this->mpath[segNum].getNode().line->length;
 	} else {
 		Point pt = calcBezierPoint(t, *this->mpath[segNum].getNode().bezier);
 		this->point->setX(this->init.getX() + pt.getX());
 		this->point->setY(this->init.getY() + pt.getY());
 		this->T++;
-		this->t = (this->speed * (double)T) / this->mpath[segNum].getNode().bezier->length;
+		this->t = this->segNum + (this->speed * (double)T) / this->mpath[segNum].getNode().bezier->length;
 	}
 
-	if(this->t >= 1) {
+	if(this->t >= segNum + 1) {
 		if(this->segNum < this->mpath.size() - 1) {
 			this->segNum++;
-			this->t = 0;
+			this->t = this->segNum;
 			this->T = 0;
 		} else {
-			this->t = 1;
+			this->t = this->segNum + 1;
 		}
 	}
 }

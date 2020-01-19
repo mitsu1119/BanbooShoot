@@ -51,7 +51,7 @@ private:
 	MovingPath mpath;
 	size_t segNum;
 	const Point init;
-	double t;		// Determine this enemy coordinate parameter. 0 <= t <= 1
+	double t;		// Determine this enemy coordinate parameter.
 	size_t T;
 public:
 	Enemy(const Image *img, int initX, int initY, double speed, MovingPath &&movingPath);															/* generate from a image handle */
