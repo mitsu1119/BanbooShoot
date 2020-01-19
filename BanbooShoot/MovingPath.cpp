@@ -2,9 +2,6 @@
 
 Point calcBezierPoint(double t, const BezierNode &bz) {
 	t -= bz.segNum;
-	if(t < 0) {
-		t = 10;
-	}
 	double x = (1 - t) * (1 - t) * (1 - t) * bz.node1.getX() + 3 * (1 - t) * (1 - t) * t * bz.node2.getX() + 3 * (1 - t) * t * t * bz.node3.getX() + t * t * t * bz.node4.getX();
 	double y = (1 - t) * (1 - t) * (1 - t) * bz.node1.getY() + 3 * (1 - t) * (1 - t) * t * bz.node2.getY() + 3 * (1 - t) * t * t * bz.node3.getY() + t * t * t * bz.node4.getY();
 	return Point(x, y);
@@ -31,7 +28,7 @@ MovingPathNode::MovingPathNode(Point &&bezir1, Point &&bezir2, Point &&bezir3, P
 	this->node.bezier->node4 = std::move(bezir4);
 	this->node.bezier->segNum = segNum;
 
-	// Calc bezier length.
+	// ベジェ曲線の弧長を計算
 	size_t accurate = 10;
 	double length = 0.0, t;
 	Point prev;

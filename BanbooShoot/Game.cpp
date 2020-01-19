@@ -45,10 +45,10 @@ Play::~Play() {
 bool Play::loadStage(std::string stagePath) {
 	MITXMLDocument pDocument(stagePath.c_str());
 
-	// Search root tag.
+	// ルートタグを探索
 	MITXMLElement *pRoot = pDocument.selectRootNode();
 
-	// Load enemyimages.
+	// 敵画像データのロード
 	std::string name, path;
 	MITXMLNodeList pList = pRoot->selectNodes("enemyimage");
 
@@ -80,8 +80,8 @@ bool Play::loadStage(std::string stagePath) {
 		this->enemyAnimations[name] = new Animation(this->enemyImages[name], enemyImageInterval);
 	}
 
-	// Make stage data.
-	// Enemy datas need to be aligned by timing.
+	// ステージデータの作成
+	// "this->stage" の敵データは出現タイミングの順でソートされている必要がある
 	MITXMLElement *pEnemy;
 	double speed;
 	int timing, x, y;
@@ -124,11 +124,11 @@ void Play::keyProcessing() {
 }
 
 void Play::enemyProcessing() {
-	// Enemy flag processings.
+	// 敵のフラグ処理
 	size_t newindex;
 	std::string enemyName;
 	for(size_t i = this->enemyCounter; i < this->stage.size(); i++) {
-		// When the appearance time of the enemy is reached, load the data from "this->stage" and make it appear.
+		// 敵の出現タイミングが来た時、"this->stage" からデータをロードし出現させる
 		if(this->counter == std::get<STG_TIMING>(this->stage[i])) {
 			if(this->falsePoolIndex.size() == 0) break;
 			enemyName = std::get<STG_NAME>(this->stage[i]);
@@ -142,7 +142,7 @@ void Play::enemyProcessing() {
 		}
 	}
 
-	// Enemys' update.
+	// 出現中の敵の更新処理
 	for(auto &i: this->enemyPool) {
 		if(std::get<POOL_FLAG>(i)) std::get<POOL_BODY>(i)->update();
 	}
@@ -162,11 +162,9 @@ void Play::draw() const {
 // ----------------------------------------------------- Game class -------------------------------------------------------
 Game::Game(ScreenRect playScreen): playScreen(playScreen) {
 	loadPlayers();
-
-	// The first scene type is play
 	this->nowSceneType = SCENE_GAME_1;
 
-	// Use player 0. 
+	// とりあえず player[0] を使用することにする
 	this->nowScene = new Play("dat\\stage\\stage1.xml", this->player[0], playScreen);
 }
 
@@ -182,10 +180,10 @@ Game::~Game() {
 bool Game::loadPlayers() {
 	MITXMLDocument pDocument("dat\\database\\player.xml");
 
-	// Search root tag.
+	// ルートタグの探索
 	MITXMLElement *pRoot = pDocument.selectRootNode();
 
-	// Load playerimages.
+	// 自機画像データのロード
 	std::string name, path, buf;
 	int sx, sy, width, height, err;
 	std::unordered_map<std::string, int> playerImagesInterval;
@@ -215,7 +213,7 @@ bool Game::loadPlayers() {
 		}
 	}
 
-	// Load playerdefines.
+	// 自機定義をロード
 	std::string leftName, rightName;
 	double speed;
 	MITXMLElement *pPlayerDefine;
