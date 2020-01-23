@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <cmath>
 #include "DxLib.h"
 
 #define WHITE GetColor(255, 255, 255)
@@ -25,6 +26,7 @@ public:
 
 	double getX() const;
 	double getY() const;
+	double getAbs() const;
 	void moveX(double dx);
 	void moveY(double dy);
 	void setX(double x);
@@ -40,6 +42,7 @@ public:
 };
 inline double Point::getX() const { return this->x; }
 inline double Point::getY() const { return this->y; }
+inline double Point::getAbs() const { return std::sqrt(this->x * this->x + this->y * this->y); }
 inline void Point::moveX(double dx) { this->x += dx; }
 inline void Point::moveY(double dy) { this->y += dy; }
 inline void Point::setX(double x) { this->x = x; }

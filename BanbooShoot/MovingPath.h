@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <cmath>
+#include <cassert>
 #include "Util.h"
 
 // キャラクタの移動情報のタイプ
@@ -12,17 +13,17 @@ enum MovingPathNodeType {
 
 typedef struct _BezierNode {
 	Point node1, node2, node3, node4;
-	double length;
-	size_t segNum;
 } BezierNode;
 
 // "bz" で表されるベジェ曲線のパラメータ "t" における座標を計算
 Point calcBezierPoint(double t, const BezierNode &bz);
 
+// "bz" で表されるベジェ曲線のパラメータ "t" における微分係数を計算
+// 戻り値は Point(dx/dt, dy/dt)
+Point calcDerivateBezier(double t, const BezierNode &bz);
+
 typedef struct _LineNode {
 	Point snode, enode;
-	double length;
-	size_t segNum;
 } LineNode;
 
 typedef union _MPNode {
@@ -45,25 +46,40 @@ public:
 
 	const MPNode &getNode() const;
 	MovingPathNodeType getType() const;
+	double getLength() const;
+	size_t getSegNum() const;
 };
 
 class MovingPath {
 private:
 	// 連続した曲線のリスト
-	/* paths = paths[0] if 0 <= t < 1
-	 *				paths[1] if 1 <= t < 2
+	/* paths = paths[0] if t = 0
+	 *				paths[1] if 0 < t <= 1
 	 *				......
-	 *				paths[i] if i <= t < i + 1
+	 *				paths[i] if i - 1 < t <= i
 	 *				......
-	 * ただし paths[i](i + 1) == paths[i + 1](i + 1)
+	 * ただし paths[i](i) == paths[i + 1](i)
 	 * このようにして一つの関数とみているため、本来ベジェ曲線のパラメータ t は 0 <= t <= 1 の範囲であるがここでのベジェ曲線の実装はセグメントにおける番号も考慮した実装となる
-	 * 例えば paths[1] のベジェ曲線は、本来 f(t) であるところを f(t - 1) としている(余分な t のパディングを引いている)
+	 * 例えば paths[2] のベジェ曲線は、本来 f(t) であるところを f(t - 1) としている(余分な t のパディングを引いている)
 	 */
 	std::vector<MovingPathNode> paths;
 
-	// 各セグメントの弧長の累積和
-	std::vector<double> cumsum;
+	// 各ノードでの t パラメータの終わりの値
+	std::vector<double> time;
 
+	// t パラメータの始まりと終わり
+	double tmin, tmax;
+
+	// パスの中のパラメータ @t に対応する座標を返す関数
+	Point calcPathPoint(double t);
+	Point calcPathDerivate(double t);		// 微分係数版
+
+	// @i 番のセグメントの始点から @t までの弧長
+	// i == 0 だとエラー
+	double arcLength(size_t i, double t);
+
+	// パスに沿って始点から @s だけ進んだ時、その地点に対応するパスのパラメータ t を計算
+	double getParam(double s);
 public:
 	MovingPath();
 	MovingPath(std::string path);

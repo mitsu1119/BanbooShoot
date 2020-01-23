@@ -86,14 +86,10 @@ void Enemy::move() {
 	if(this->mpath[segNum].getType() == MPNT_LINE) {
 		this->point->setX(this->init.getX() + this->mpath[segNum].getNode().line->snode.getX() + (this->mpath[segNum].getNode().line->enode.getX() - this->mpath[segNum].getNode().line->snode.getX()) * this->t);
 		this->point->setY(this->init.getY() + this->mpath[segNum].getNode().line->snode.getY() + (this->mpath[segNum].getNode().line->enode.getY() - this->mpath[segNum].getNode().line->snode.getY()) * this->t);
-		this->T++;
-		this->t = this->segNum + (this->speed * (double)T) / this->mpath[segNum].getNode().line->length;
 	} else {
 		Point pt = calcBezierPoint(t, *this->mpath[segNum].getNode().bezier);
 		this->point->setX(this->init.getX() + pt.getX());
 		this->point->setY(this->init.getY() + pt.getY());
-		this->T++;
-		this->t = this->segNum + (this->speed * (double)T) / this->mpath[segNum].getNode().bezier->length;
 	}
 
 	if(this->t >= segNum + 1) {
