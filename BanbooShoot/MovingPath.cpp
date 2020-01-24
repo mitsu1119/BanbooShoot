@@ -51,7 +51,13 @@ MovingPathNodeType MovingPathNode::getType() const {
 }
 
 MovingPath::MovingPath() {
-	this->tmax = 10;
+	this->paths.emplace_back(MovingPathNode(Point(0, 0), Point(0, 0)));
+	this->time = {0.0};
+	this->tmin = 0.0;
+	this->tmax = 0.0;
+	this->lengthSeg = {0.0};
+	this->cumsumLenSeg = {0.0};
+	this->lengthTotal = 0.0;
 }
 
 MovingPath::MovingPath(std::string path) {
@@ -60,11 +66,11 @@ MovingPath::MovingPath(std::string path) {
 	bool firstFlag = true;
 	Point *pad = nullptr;
 	int now = MPNT_LINE;
-	size_t cnt = 0, index = 0;
+	size_t cnt = 0, index = 1;
 	Point start;
 
-	this->paths.emplace_back(Point(0, 0), Point(0, 0));
-	this->time.emplace_back(0.0);
+	this->paths.emplace_back(MovingPathNode(Point(0, 0), Point(0, 0)));
+	this->time = {0.0};
 	while(cnt < tokens.size()) {
 		if(tokens[cnt] == "M" || tokens[cnt] == "m") {
 			now = MPNT_LINE;
@@ -78,12 +84,13 @@ MovingPath::MovingPath(std::string path) {
 		} else if(tokens[cnt] == "L" || tokens[cnt] == "l") {
 			now = MPNT_LINE;
 		} else {
+			assert(pad != nullptr);
 			if(now == MPNT_LINE) {
 				x = std::stof(tokens[cnt]);
 				y = std::stof(tokens[cnt + 1]);
 				Point end(x, y);
 				this->paths.emplace_back(start - *pad, end - *pad);
-				this->time.emplace_back((double)index + 1);
+				this->time.emplace_back((double)index);
 				start = end;
 				index++;
 				cnt++;
@@ -92,7 +99,7 @@ MovingPath::MovingPath(std::string path) {
 				y = std::stof(tokens[cnt + 5]);
 				Point end(x, y);
 				this->paths.emplace_back(start - *pad, Point(std::stof(tokens[cnt]), std::stof(tokens[cnt + 1])) - *pad, Point(std::stof(tokens[cnt + 2]), std::stof(tokens[cnt + 3])) - *pad, end - *pad);
-				this->time.emplace_back((double)index + 1);
+				this->time.emplace_back((double)index);
 				start = end;
 				index++;
 				cnt += 5;
@@ -105,11 +112,11 @@ MovingPath::MovingPath(std::string path) {
 	this->tmax = this->time.back();
 
 	// ’·‚³‚Ì‰Šú‰»
-	this->lengthSeg.emplace_back(0.0);
-	this->cumsumLenSeg.emplace_back(0.0);
+	this->lengthSeg = std::vector<double>(this->time.size(), 0.0);
+	this->cumsumLenSeg = std::vector<double>(this->time.size(), 0.0);
 	for(size_t i = 1; i < this->time.size(); i++) {
-		this->lengthSeg.emplace_back(arcLength(i, this->time[i]));
-		this->cumsumLenSeg.emplace_back(this->cumsumLenSeg.back() + this->lengthSeg.back());
+		this->lengthSeg[i] = arcLength(i, this->time[i]);
+		this->cumsumLenSeg[i] = this->cumsumLenSeg[i - 1] + this->lengthSeg[i];
 	}
 	this->lengthTotal = this->cumsumLenSeg.back();
 

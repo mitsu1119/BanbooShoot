@@ -51,7 +51,7 @@ private:
 	MovingPath mpath;
 	size_t segNum;
 	const Point init;
-	double t;		// キャラクターの位置を決定するパラメータ
+	double s;		// キャラクターの移動した距離
 
 public:
 	Enemy(const Image *img, int initX, int initY, double speed, MovingPath &&movingPath);															/* generate from a image handle */

@@ -71,10 +71,10 @@ void Player::draw() const {
 }
 
 // ----------------------------------------------------- Enemy class ------------------------------------------------------
-Enemy::Enemy(const Image *img, int initX, int initY, double speed, MovingPath &&movingPath): Character(img, initX, initY, speed), mpath(movingPath), t(0), segNum(0), init(initX, initY) {
+Enemy::Enemy(const Image *img, int initX, int initY, double speed, MovingPath &&movingPath): Character(img, initX, initY, speed), mpath(movingPath), s(0), segNum(0), init(initX, initY) {
 }
 
-Enemy::Enemy(std::vector<const Image *> &anim, size_t animInterval, int initX, int initY, double speed, MovingPath &&movingPath): Character(anim, animInterval, initX, initY, speed), mpath(movingPath), t(0),  segNum(0), init(initX, initY) {
+Enemy::Enemy(std::vector<const Image *> &anim, size_t animInterval, int initX, int initY, double speed, MovingPath &&movingPath): Character(anim, animInterval, initX, initY, speed), mpath(movingPath), s(0),  segNum(0), init(initX, initY) {
 }
 
 void Enemy::update() {
@@ -83,10 +83,10 @@ void Enemy::update() {
 }
 
 void Enemy::move() {
-	Point pt = this->mpath.calcPathPoint(this->mpath.getParam(t));
+	Point pt = this->mpath.calcPathPoint(this->mpath.getParam(this->s));
 	this->point->setX(this->init.getX() + pt.getX());
 	this->point->setY(this->init.getY() + pt.getY());
-	this->t += 5;
+	this->s += this->speed;
 }
 
 void Enemy::draw() const {
