@@ -16,7 +16,7 @@ Point calcDerivateBezier(double t, const BezierNode &bz) {
 	return Point(x, y);
 }
 
-MovingPathNode::MovingPathNode(Point &&startPoint, Point &&endPoint, size_t segNum): type(MPNT_LINE) {
+MovingPathNode::MovingPathNode(Point &&startPoint, Point &&endPoint): type(MPNT_LINE) {
 	this->node.line = new LineNode;
 	this->node.line->snode = std::move(startPoint);
 	this->node.line->enode = std::move(endPoint);
@@ -27,7 +27,7 @@ MovingPathNode::~MovingPathNode() {
 	else delete this->node.bezier;
 }
 
-MovingPathNode::MovingPathNode(Point &&bezir1, Point &&bezir2, Point &&bezir3, Point &&bezir4, size_t segNum) : type(MPNT_BEZIER) {
+MovingPathNode::MovingPathNode(Point &&bezir1, Point &&bezir2, Point &&bezir3, Point &&bezir4) : type(MPNT_BEZIER) {
 	this->node.bezier = new BezierNode;
 	this->node.bezier->node1 = std::move(bezir1);
 	this->node.bezier->node2 = std::move(bezir2);
@@ -51,10 +51,11 @@ MovingPathNodeType MovingPathNode::getType() const {
 }
 
 MovingPath::MovingPath() {
+	this->tmax = 10;
 }
 
 MovingPath::MovingPath(std::string path) {
-	double x, y, cumsumbuf = 0;
+	double x, y;
 	auto tokens = splitStr(path, {' ', ','});
 	bool firstFlag = true;
 	Point *pad = nullptr;
@@ -62,7 +63,7 @@ MovingPath::MovingPath(std::string path) {
 	size_t cnt = 0, index = 0;
 	Point start;
 
-	this->paths.emplace_back(Point(0, 0), Point(0, 0), 0);
+	this->paths.emplace_back(Point(0, 0), Point(0, 0));
 	this->time.emplace_back(0.0);
 	while(cnt < tokens.size()) {
 		if(tokens[cnt] == "M" || tokens[cnt] == "m") {
@@ -81,8 +82,8 @@ MovingPath::MovingPath(std::string path) {
 				x = std::stof(tokens[cnt]);
 				y = std::stof(tokens[cnt + 1]);
 				Point end(x, y);
-				this->paths.emplace_back(start - *pad, end - *pad, index);
-				this->time.emplace_back(index);
+				this->paths.emplace_back(start - *pad, end - *pad);
+				this->time.emplace_back((double)index + 1);
 				start = end;
 				index++;
 				cnt++;
@@ -90,8 +91,8 @@ MovingPath::MovingPath(std::string path) {
 				x = std::stof(tokens[cnt + 4]);
 				y = std::stof(tokens[cnt + 5]);
 				Point end(x, y);
-				this->paths.emplace_back(start - *pad, Point(std::stof(tokens[cnt]), std::stof(tokens[cnt + 1])) - *pad, Point(std::stof(tokens[cnt + 2]), std::stof(tokens[cnt + 3])) - *pad, end - *pad, index);
-				this->time.emplace_back(index);
+				this->paths.emplace_back(start - *pad, Point(std::stof(tokens[cnt]), std::stof(tokens[cnt + 1])) - *pad, Point(std::stof(tokens[cnt + 2]), std::stof(tokens[cnt + 3])) - *pad, end - *pad);
+				this->time.emplace_back((double)index + 1);
 				start = end;
 				index++;
 				cnt += 5;
@@ -103,11 +104,22 @@ MovingPath::MovingPath(std::string path) {
 	this->tmin = this->time[0];
 	this->tmax = this->time.back();
 
+	// 長さの初期化
+	this->lengthSeg.emplace_back(0.0);
+	this->cumsumLenSeg.emplace_back(0.0);
+	for(size_t i = 1; i < this->time.size(); i++) {
+		this->lengthSeg.emplace_back(arcLength(i, this->time[i]));
+		this->cumsumLenSeg.emplace_back(this->cumsumLenSeg.back() + this->lengthSeg.back());
+	}
+	this->lengthTotal = this->cumsumLenSeg.back();
+
 	if(pad != nullptr) delete pad;
 }
 
 Point MovingPath::calcPathPoint(double t) {
 	size_t index = 1;
+
+	if(t > this->tmax) t = this->tmax;
 	while(t > 1.0) {
 		t -= 1.0;
 		index++;
@@ -117,6 +129,8 @@ Point MovingPath::calcPathPoint(double t) {
 
 Point MovingPath::calcPathDerivate(double t) {
 	size_t index = 1;
+	
+	if(t > this->tmax) t = this->tmax;
 	while(t > 1.0) {
 		t -= 1.0;
 		index++;
@@ -145,10 +159,44 @@ double MovingPath::arcLength(size_t i, double t) {
 double MovingPath::getParam(double s) {
 	// s \in [0, totalLength] が与えられたときそれに対応する t \in [tmin, tmax] を計算
 	if(s <= 0) return this->tmin;
+	if(s >= this->lengthTotal) return this->tmax;
 
 	// s がどの番号のセグメントに属するか決定
+	size_t i;
+	size_t p = this->cumsumLenSeg.size();
+	for(i = 1; i < p; i++) {
+		if(s < this->cumsumLenSeg[i]) break;
+	}
 
-
+	// ニュートン法の初期化
+	double segS = s - this->cumsumLenSeg[i - 1];
+	double segL = lengthSeg[i];
+	double segTMin = this->time[i - 1];
+	double segTMax = this->time[i];
+	double segT = segTMin + (segTMax - segTMin) * (segS / segL);
 
 	// 二分法の初期化
+	double lower = segTMin, upper = segTMax;
+
+	size_t occurate = 20;
+	double eps = 0.5;
+	for(size_t j = 0; j < occurate; j++) {
+		double F = this->arcLength(i, segT) - segS;
+		if(std::abs(F) <= eps) return segT;
+
+		double dfdt = this->calcPathDerivate(segT).getAbs();
+		double segTCandidate = segT - F / dfdt;
+
+		if(F > 0) {
+			upper = segT;
+			if(segTCandidate <= lower) segT = (upper + lower) / 2;
+			else segT = segTCandidate;
+		} else {
+			lower = segT;
+			if(segTCandidate >= upper) segT = (upper + lower) / 2;
+			else segT = segTCandidate;
+		}
+	}
+
+	return segT;
 }

@@ -71,10 +71,10 @@ void Player::draw() const {
 }
 
 // ----------------------------------------------------- Enemy class ------------------------------------------------------
-Enemy::Enemy(const Image *img, int initX, int initY, double speed, MovingPath &&movingPath): Character(img, initX, initY, speed), mpath(movingPath), t(0), T(0), segNum(0), init(initX, initY) {
+Enemy::Enemy(const Image *img, int initX, int initY, double speed, MovingPath &&movingPath): Character(img, initX, initY, speed), mpath(movingPath), t(0), segNum(0), init(initX, initY) {
 }
 
-Enemy::Enemy(std::vector<const Image *> &anim, size_t animInterval, int initX, int initY, double speed, MovingPath &&movingPath): Character(anim, animInterval, initX, initY, speed), mpath(movingPath), t(0), T(0), segNum(0), init(initX, initY) {
+Enemy::Enemy(std::vector<const Image *> &anim, size_t animInterval, int initX, int initY, double speed, MovingPath &&movingPath): Character(anim, animInterval, initX, initY, speed), mpath(movingPath), t(0),  segNum(0), init(initX, initY) {
 }
 
 void Enemy::update() {
@@ -83,24 +83,10 @@ void Enemy::update() {
 }
 
 void Enemy::move() {
-	if(this->mpath[segNum].getType() == MPNT_LINE) {
-		this->point->setX(this->init.getX() + this->mpath[segNum].getNode().line->snode.getX() + (this->mpath[segNum].getNode().line->enode.getX() - this->mpath[segNum].getNode().line->snode.getX()) * this->t);
-		this->point->setY(this->init.getY() + this->mpath[segNum].getNode().line->snode.getY() + (this->mpath[segNum].getNode().line->enode.getY() - this->mpath[segNum].getNode().line->snode.getY()) * this->t);
-	} else {
-		Point pt = calcBezierPoint(t, *this->mpath[segNum].getNode().bezier);
-		this->point->setX(this->init.getX() + pt.getX());
-		this->point->setY(this->init.getY() + pt.getY());
-	}
-
-	if(this->t >= segNum + 1) {
-		if(this->segNum < this->mpath.size() - 1) {
-			this->segNum++;
-			this->t = this->segNum;
-			this->T = 0;
-		} else {
-			this->t = this->segNum + 1;
-		}
-	}
+	Point pt = this->mpath.calcPathPoint(this->mpath.getParam(t));
+	this->point->setX(this->init.getX() + pt.getX());
+	this->point->setY(this->init.getY() + pt.getY());
+	this->t += 5;
 }
 
 void Enemy::draw() const {

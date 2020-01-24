@@ -51,8 +51,8 @@ private:
 	MovingPath mpath;
 	size_t segNum;
 	const Point init;
-	double t;		// Determine this enemy coordinate parameter.
-	size_t T;
+	double t;		// キャラクターの位置を決定するパラメータ
+
 public:
 	Enemy(const Image *img, int initX, int initY, double speed, MovingPath &&movingPath);															/* generate from a image handle */
 	Enemy(std::vector<const Image *> &anim, size_t animInterval, int initX, int initY, double speed, MovingPath &&movingPath);		/* generate from animation parts */

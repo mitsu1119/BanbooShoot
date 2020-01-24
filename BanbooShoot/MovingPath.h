@@ -38,16 +38,14 @@ private:
 	MPNode node;
 
 public:
-	MovingPathNode(Point &&startPoint, Point &&endPoint, size_t segNum);
-	MovingPathNode(Point &&bezir1, Point &&bezir2, Point &&bezir3, Point &&bezir4, size_t segNum);
+	MovingPathNode(Point &&startPoint, Point &&endPoint);
+	MovingPathNode(Point &&bezir1, Point &&bezir2, Point &&bezir3, Point &&bezir4);
 	MovingPathNode(const MovingPathNode &movingpathnode) = default;
 	MovingPathNode(MovingPathNode &&movingpathnode) noexcept;
 	~MovingPathNode();
 
 	const MPNode &getNode() const;
 	MovingPathNodeType getType() const;
-	double getLength() const;
-	size_t getSegNum() const;
 };
 
 class MovingPath {
@@ -70,8 +68,11 @@ private:
 	// t パラメータの始まりと終わり
 	double tmin, tmax;
 
+	// パスの各セグメントの長さとその累積和
+	std::vector<double> lengthSeg, cumsumLenSeg;
+	double lengthTotal;
+
 	// パスの中のパラメータ @t に対応する座標を返す関数
-	Point calcPathPoint(double t);
 	Point calcPathDerivate(double t);		// 微分係数版
 
 	// @i 番のセグメントの始点から @t までの弧長
@@ -79,10 +80,12 @@ private:
 	double arcLength(size_t i, double t);
 
 	// パスに沿って始点から @s だけ進んだ時、その地点に対応するパスのパラメータ t を計算
-	double getParam(double s);
 public:
 	MovingPath();
 	MovingPath(std::string path);
+
+	Point calcPathPoint(double t);
+	double getParam(double s);
 
 	using iterator = std::vector<MovingPathNode>::iterator;
 	using const_iterator = std::vector<MovingPathNode>::const_iterator;
