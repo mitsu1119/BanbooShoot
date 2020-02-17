@@ -30,12 +30,12 @@ void Character::draw() const {
 }
 
 // ----------------------------------------------------- Player class -----------------------------------------------------
-Player::Player(const Image *img, int initX, int initY, double speed): Character(img, initX, initY, speed), movingDir(CENTER) {
+Player::Player(const Image *img, int initX, int initY, double speed, const Image *shotImage): Character(img, initX, initY, speed), movingDir(CENTER), shotImage(shotImage) {
 	this->leftAnim = new Animation(img);
 	this->rightAnim = new Animation(img);
 }
 
-Player::Player(std::vector<const Image *> &anim, std::vector<const Image *> &leftAnimation, std::vector<const Image *> &rightAnimation, size_t animInterval, int initX, int initY, double speed): Character(anim, animInterval, initX, initY, speed), movingDir(CENTER) {
+Player::Player(std::vector<const Image *> &anim, std::vector<const Image *> &leftAnimation, std::vector<const Image *> &rightAnimation, size_t animInterval, int initX, int initY, double speed, const Image *shotImage): Character(anim, animInterval, initX, initY, speed), movingDir(CENTER), shotImage(shotImage) {
 	this->leftAnim = new Animation(leftAnimation, animInterval);
 	this->rightAnim = new Animation(rightAnimation, animInterval);
 }
@@ -51,6 +51,10 @@ void Player::move(Direction dir) {
 
 	this->point->moveX(speed * cos(dir *M_PI / 4));
 	this->point->moveY(-1 * speed * sin(dir * M_PI / 4));
+}
+
+void Player::shot(std::vector<std::tuple<bool, const Image *>> &pool) {
+	pool.emplace_back(true, this->shotImage);
 }
 
 void Player::draw() const {
@@ -108,7 +112,7 @@ void Enemy::draw() const {
 		} else {
 			bz = dnode->bezier;
 			if(isFirst) DrawCircle(this->init.getX() + bz->node1.getX(), this->init.getY() +bz->node1.getY(), 3, WHITE);
-			DrawCircle(this->init.getX() + bz->node4.getX(), this->init.getY() +bz->node4.getY(), 3, WHITE);
+			DrawCircle(this->init.getX() + bz->node4.getX(), this->init.getY() + bz->node4.getY(), 3, WHITE);
 
 			// Draw bezier
 			for(double t = 0; t <= 1; t += 0.01) {

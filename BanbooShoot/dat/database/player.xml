@@ -20,5 +20,5 @@
 	<playerimage name="Shirokami_chann_right" path="dat\\image\\player\\ShirokamiRight.png" />
 		
 	<!-- プレイヤーの定義 -->
-	<playerdefine name="Shirokami_chann" leftname="Shirokami_chann_left" rightname="Shirokami_chann_right" speed="5" />
+	<playerdefine name="Shirokami_chann" leftname="Shirokami_chann_left" rightname="Shirokami_chann_right" speed="5" shotname="varistor" />
 </player>

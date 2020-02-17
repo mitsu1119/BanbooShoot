@@ -1,7 +1,7 @@
-#include "DxLib.h"
 #include "Game.h"
 #include "Util.h"
 #include "mitXML.h"
+#include "DxLib.h"
 
 // main
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) {

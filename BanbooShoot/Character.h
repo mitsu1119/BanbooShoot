@@ -1,6 +1,7 @@
 #pragma once
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include <tuple>
 #include "Util.h"
 #include "MovingPath.h"
 
@@ -35,13 +36,15 @@ class Player: public Character {
 private:
 	Animation *leftAnim, *rightAnim;
 	Direction movingDir;
+	const Image *shotImage;
 
 public:
-	Player(const Image *img, int initX, int initY, double speed);																/* generate from a image handle */
-	Player(std::vector<const Image *> &anim, std::vector<const Image *> &leftAnimation, std::vector<const Image *> &rightAnimation, size_t animInterval, int initX, int initY, double speed);	/* generate from animation parts */
+	Player(const Image *img, int initX, int initY, double speed, const Image *shotImage);	/* generate from a image handle */
+	Player(std::vector<const Image *> &anim, std::vector<const Image *> &leftAnimation, std::vector<const Image *> &rightAnimation, size_t animInterval, int initX, int initY, double speed, const Image *shotImage);	/* generate from animation parts */
 	~Player();
 	
 	void move(Direction dir);
+	void shot(std::vector<std::tuple<bool, const Image *>> &pool);
 	void draw() const;
 };
 
@@ -54,7 +57,7 @@ private:
 	double s;		// キャラクターの移動した距離
 
 public:
-	Enemy(const Image *img, int initX, int initY, double speed, MovingPath &&movingPath);															/* generate from a image handle */
+	Enemy(const Image *img, int initX, int initY, double speed, MovingPath &&movingPath);	/* generate from a image handle */
 	Enemy(std::vector<const Image *> &anim, size_t animInterval, int initX, int initY, double speed, MovingPath &&movingPath);		/* generate from animation parts */
 
 	void update();

@@ -21,7 +21,7 @@ void Scene::checkKey() {
 }
 
 // ----------------------------------------------------- Play class -------------------------------------------------------
-Play::Play(std::string stagePath, Player *player, ScreenRect screen): Scene(), player(player), enemyCounter(0), screen(screen) {
+Play::Play(std::string stagePath, Player *player, ScreenRect screen): Scene(), pShotFlag(false), player(player), enemyCounter(0), screen(screen) {
 	this->enemyPool.resize(MAX_ENEMY_NUM);
 	this->falsePoolIndex.resize(MAX_ENEMY_NUM);
 	std::iota(this->falsePoolIndex.begin(), this->falsePoolIndex.end(), 0);
@@ -109,6 +109,13 @@ int Play::update() {
 	return 0;
 }
 
+void Play::checkKey() {
+	Scene::checkKey();
+
+	int padkey = GetJoypadInputState(DX_INPUT_KEY_PAD1);
+	if(padkey & PAD_INPUT_1) this->pShotFlag = true;
+}
+
 void Play::keyProcessing() {
 	double harfX = this->player->getImage()->getSizeX() / 2.0;
 	double harfY = this->player->getImage()->getSizeY() / 2.0;
@@ -121,6 +128,8 @@ void Play::keyProcessing() {
 		if(this->player->getPoint()->getY() - harfY / 2.0 < topY) this->player->setCoord(this->player->getPoint()->getX(), topY+ harfY / 2.0);
 		else if(this->player->getPoint()->getY() + harfY / 2.0 > bottomY) this->player->setCoord(this->player->getPoint()->getX(), bottomY - harfY / 2.0);
 	}
+
+	if(this->pShotFlag) this->player->shot(this->playerShotPool);
 }
 
 void Play::enemyProcessing() {
@@ -152,6 +161,9 @@ void Play::draw() const {
 	ClearDrawScreen();
 
 	this->player->draw();
+	for(auto &i: this->playerShotPool) {
+		if(std::get<POOL_FLAG>(i)) DrawGraph(0, 0, std::get<POOL_BODY>(i)->getHandle(), true);
+	}
 	for(auto &i: this->enemyPool) {
 		if(std::get<POOL_FLAG>(i)) std::get<POOL_BODY>(i)->draw();
 	}
@@ -161,6 +173,7 @@ void Play::draw() const {
 
 // ----------------------------------------------------- Game class -------------------------------------------------------
 Game::Game(ScreenRect playScreen): playScreen(playScreen) {
+	loadShots();
 	loadPlayers();
 	this->nowSceneType = SCENE_GAME_1;
 
@@ -171,10 +184,32 @@ Game::Game(ScreenRect playScreen): playScreen(playScreen) {
 Game::~Game() {
 	for(auto &i: this->player) delete i;
 	delete this->nowScene;
+
+	for(auto &myPair: this->shotImages) delete myPair.second;
 	for(auto &myPair: this->playerImages) {
 		for(auto &image: myPair.second)
 			delete image;
 	}
+}
+
+bool Game::loadShots() {
+	MITXMLDocument pDocument("dat\\database\\shot.xml");
+
+	// ルートタグの探索
+	MITXMLElement *pRoot = pDocument.selectRootNode();
+
+	// 弾画像データのロード
+	std::string name, path;
+	MITXMLElement *pShotImage;
+	MITXMLNodeList pList = pRoot->selectNodes("shotimage");
+	for(size_t i = 0; i < pList.length(); i++) {
+		pShotImage = pList.item[i];
+		name = pShotImage->getAttribute("name");
+		path = pShotImage->getAttribute("path");
+		this->shotImages[name] = new Image(path.c_str());
+	}
+
+	return true;
 }
 
 bool Game::loadPlayers() {
@@ -231,7 +266,8 @@ bool Game::loadPlayers() {
 		if(err != E_NULL) rightName = buf;
 		else rightName = name;
 
-		this->player.emplace_back(new Player(this->playerImages[name], this->playerImages[leftName], this->playerImages[rightName], playerImagesInterval[name], this->playScreen.getRightX() / 2, this->playScreen.getBottomY() - 60, speed));
+		// とりあえずバリスタショット
+		this->player.emplace_back(new Player(this->playerImages[name], this->playerImages[leftName], this->playerImages[rightName], playerImagesInterval[name], this->playScreen.getRightX() / 2, this->playScreen.getBottomY() - 60, speed, this->shotImages["varistor"]));
 	}
 	return true;
 }

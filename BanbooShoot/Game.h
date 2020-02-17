@@ -19,7 +19,7 @@ protected:
 
 	Direction keyDirection;
 
-	void checkKey();
+	virtual void checkKey();
 	virtual void keyProcessing() = 0;
 
 public:
@@ -41,6 +41,7 @@ constexpr size_t MAX_ENEMY_NUM = 10;
 class Play: public Scene {
 private:
 	// Player datas.
+	bool pShotFlag;		// true だとプレイヤーはショットを打つことになる
 	Player *player;
 
 	// Enemy datas.
@@ -48,11 +49,14 @@ private:
 		POOL_FLAG, POOL_BODY
 	};
 	std::vector<std::tuple<bool, Enemy *>> enemyPool;
-	std::deque<size_t> falsePoolIndex;		// List of indexes for "this->enemyPool" with the flag is false.
+	std::deque<size_t> falsePoolIndex;		// this->enemyPool のフラグが false であるインデックスのリスト
+	std::vector<std::tuple<bool, const Image *>> playerShotPool;
+	std::deque<size_t> falsePlayerShotPoolIndex;
 	Stage stage;
 	size_t enemyCounter;
 
 	// System datas.
+	void checkKey();
 	void keyProcessing();
 	ScreenRect screen;
 	void enemyProcessing();
@@ -89,9 +93,11 @@ private:
 
 	// Image database.
 	std::unordered_map<std::string, std::vector<const Image *>> playerImages;
+	std::unordered_map<std::string, const Image *> shotImages;
 
 	// Loading function.
 	bool loadPlayers();
+	bool loadShots();
 
 public:
 	Game(ScreenRect playScreen);

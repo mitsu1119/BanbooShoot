@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shot>
+	<!-- 弾画像の定義 -->
+	<shotimage name="varistor" path="dat\\image\\shot\\varistor.png" />
+</shot>
